@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Certificate Validator{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+
+    <!-- Statistics Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Authentic</h5>
+                    <h3>{{ stats.status_distribution.get('AUTHENTIC', 0) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Suspicious</h5>
+                    <h3>{{ stats.status_distribution.get('SUSPICIOUS', 0) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Fake</h5>
+                    <h3>{{ stats.status_distribution.get('FAKE', 0) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Total Verifications</h5>
+                    <h3>{{ stats.total_verifications }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OCR Upload Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="fas fa-file-upload me-2"></i>Upload Certificate (PDF/Image) for OCR
+        </div>
+        <div class="card-body">
+            <form id="ocrUploadForm" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="file" class="form-control" id="ocrFile" name="file" accept=".pdf,.png,.jpg,.jpeg,.bmp,.tiff,.gif" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-magic me-2"></i>Extract with OCR
+                </button>
+            </form>
+            <div id="ocrAlert" class="alert mt-3" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Add Minimal Certificate Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="fas fa-plus-circle me-2"></i>Add New SEM3 Result Certificate
+        </div>
+        <div class="card-body">
+            <form id="addCertificateForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="seat_no" class="form-label">Seat Number *</label>
+                        <input type="text" class="form-control" id="seat_no" required placeholder="e.g., S1900508770">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="student_name" class="form-label">Student Name *</label>
+                        <input type="text" class="form-control" id="student_name" required placeholder="e.g., Aniket Todkar">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="mother_name" class="form-label">Mother Name *</label>
+                        <input type="text" class="form-control" id="mother_name" required placeholder="e.g., Rupali Todkar">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="college_name" class="form-label">College Name *</label>
+                        <input type="text" class="form-control" id="college_name" required placeholder="e.g., Pune Institute of Computer Technology">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="sgpa" class="form-label">SGPA *</label>
+                        <input type="number" step="0.01" min="0" max="10" class="form-control" id="sgpa" required placeholder="e.g., 9.59">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="result_date" class="form-label">Result Date *</label>
+                        <input type="text" class="form-control" id="result_date" required placeholder="e.g., 31 January 2025">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="subject" class="form-label">Subject *</label>
+                        <input type="text" class="form-control" id="subject" required placeholder="e.g., Information Technology">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>Add Certificate
+                </button>
+                <button type="button" class="btn btn-secondary ms-2" onclick="resetCertForm()">
+                    <i class="fas fa-undo me-2"></i>Reset Form
+                </button>
+            </form>
+
+            <div id="certAlert" class="alert mt-3" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// OCR Upload Handler
+document.getElementById('ocrUploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('ocrFile');
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    try {
+        const response = await fetch('/api/ocr-extract', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        const alertDiv = document.getElementById('ocrAlert');
+
+        if (response.ok) {
+            alertDiv.className = 'alert alert-success mt-3';
+            alertDiv.innerHTML = `<strong>Success!</strong> Data extracted. Review and submit.`;
+            alertDiv.style.display = 'block';
+
+            // Autofill the Add Certificate form
+            const extracted = data.extracted_data || {};
+            document.getElementById('seat_no').value = extracted.seat_no || "";
+            document.getElementById('student_name').value = extracted.student_name || "";
+            document.getElementById('mother_name').value = extracted.mother_name || "";
+            document.getElementById('college_name').value = extracted.college_name || "";
+            document.getElementById('sgpa').value = extracted.sgpa || "";
+            document.getElementById('result_date').value = extracted.result_date || "";
+            document.getElementById('subject').value = extracted.subject || "";
+
+        } else {
+            alertDiv.className = 'alert alert-danger mt-3';
+            alertDiv.innerHTML = `<strong>Error!</strong> ${data.error || 'Failed to extract data.'}`;
+            alertDiv.style.display = 'block';
+        }
+
+        setTimeout(() => alertDiv.style.display = 'none', 5000);
+
+    } catch (error) {
+        const alertDiv = document.getElementById('ocrAlert');
+        alertDiv.className = 'alert alert-danger mt-3';
+        alertDiv.innerHTML = `<strong>Error!</strong> ${error.message}`;
+        alertDiv.style.display = 'block';
+    }
+});
+
+// Add Certificate Handler (unchanged)
+document.getElementById('addCertificateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = {
+        seat_no: document.getElementById('seat_no').value,
+        student_name: document.getElementById('student_name').value,
+        mother_name: document.getElementById('mother_name').value,
+        college_name: document.getElementById('college_name').value,
+        sgpa: parseFloat(document.getElementById('sgpa').value),
+        result_date: document.getElementById('result_date').value,
+        subject: document.getElementById('subject').value
+    };
+
+    try {
+        const response = await fetch('/api/certificates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        const alertDiv = document.getElementById('certAlert');
+
+        if (response.ok) {
+            alertDiv.className = 'alert alert-success mt-3';
+            alertDiv.innerHTML = `<strong>Success!</strong> Certificate added successfully.`;
+            alertDiv.style.display = 'block';
+            setTimeout(() => document.getElementById('addCertificateForm').reset(), 2000);
+        } else {
+            alertDiv.className = 'alert alert-danger mt-3';
+            alertDiv.innerHTML = `<strong>Error!</strong> ${data.error || 'Failed to add certificate.'}`;
+            alertDiv.style.display = 'block';
+        }
+
+        setTimeout(() => alertDiv.style.display = 'none', 5000);
+
+    } catch (error) {
+        const alertDiv = document.getElementById('certAlert');
+        alertDiv.className = 'alert alert-danger mt-3';
+        alertDiv.innerHTML = `<strong>Error!</strong> ${error.message}`;
+        alertDiv.style.display = 'block';
+    }
+});
+
+function resetCertForm() {
+    document.getElementById('addCertificateForm').reset();
+    document.getElementById('certAlert').style.display = 'none';
+}
+
+</script>
+{% endblock %}
