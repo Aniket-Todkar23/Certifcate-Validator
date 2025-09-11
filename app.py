@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-"""
-Main Flask Application for Certificate Validator
-Handles all API endpoints and web interface
-"""
+""" Main Flask Application for Certificate Validator
+Handles all API endpoints and web interface """
 
 import os
 import tempfile
@@ -103,10 +101,8 @@ def admin_logout():
 # API Routes
 @app.route('/api/verify', methods=['POST'])
 def verify_certificate():
-    """
-    Main certificate verification endpoint
-    Accepts file upload and returns verification results
-    """
+    """ Main certificate verification endpoint
+    Accepts file upload and returns verification results """
     try:
         # Check if file was uploaded
         if 'certificate' not in request.files:
@@ -115,7 +111,6 @@ def verify_certificate():
         file = request.files['certificate']
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
-
         if not allowed_file(file.filename):
             return jsonify({'error': 'File type not allowed'}), 400
 
@@ -123,7 +118,6 @@ def verify_certificate():
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
         unique_filename = timestamp + filename
-
         temp_path = os.path.join(UPLOAD_FOLDER, unique_filename)
         file.save(temp_path)
 
@@ -166,7 +160,6 @@ def verify_certificate():
                 'timestamp': log_entry.created_at.isoformat(),
                 'recommendations': generate_recommendations(verification_result)
             }
-
             return jsonify(response), 200
 
         finally:
@@ -238,8 +231,10 @@ def add_institution():
     """Add new institution (admin only)"""
     if not session.get('admin_logged_in'):
         return jsonify({'error': 'Admin access required'}), 401
+
     try:
         data = request.get_json()
+
         # Validate required fields
         required_fields = ['name', 'code']
         for field in required_fields:
@@ -264,15 +259,65 @@ def add_institution():
         db.session.add(institution)
         db.session.commit()
         return jsonify(institution.to_dict()), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/ocr-extract', methods=['POST'])
+def ocr_extract():
+    """OCR extraction endpoint for admin use"""
+    if not session.get('admin_logged_in'):
+        return jsonify({'error': 'Admin access required'}), 401
+
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'File type not allowed'}), 400
+
+        # Save uploaded file temporarily
+        filename = secure_filename(file.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
+        unique_filename = timestamp + filename
+        temp_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+        file.save(temp_path)
+
+        try:
+            # Process document with OCR
+            raw_text, extracted_data = ocr_processor.process_document(temp_path)
+            
+            # Validate extraction quality
+            extraction_validation = ocr_processor.validate_extraction_quality(extracted_data)
+            
+            return jsonify({
+                'success': True,
+                'extracted_data': extracted_data,
+                'raw_text': raw_text,
+                'extraction_confidence': round(extraction_validation['overall_confidence'], 3),
+                'extraction_issues': extraction_validation['issues']
+            }), 200
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+                
+    except Exception as e:
+        app.logger.error(f"OCR extraction error: {str(e)}")
+        return jsonify({'error': f'OCR extraction failed: {str(e)}'}), 500
 
 
 @app.route('/api/certificates', methods=['POST'])
 def add_certificate():
     if not session.get('admin_logged_in'):
         return jsonify({'error': 'Admin access required'}), 401
+
     try:
         data = request.get_json()
         required_fields = ['seat_no', 'student_name', 'mother_name', 'college_name', 'sgpa', 'result_date', 'subject']
@@ -298,6 +343,7 @@ def add_certificate():
         db.session.add(certificate)
         db.session.commit()
         return jsonify({'message': 'Certificate added successfully', 'id': certificate.id}), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
@@ -308,17 +354,14 @@ def get_verification_history():
     """Get verification history (admin only)"""
     if not session.get('admin_logged_in'):
         return jsonify({'error': 'Admin access required'}), 401
+
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
 
         logs = VerificationLog.query.order_by(
             VerificationLog.created_at.desc()
-        ).paginate(
-            page=page,
-            per_page=per_page,
-            error_out=False
-        )
+        ).paginate(page=page, per_page=per_page, error_out=False)
 
         return jsonify({
             'logs': [log.to_dict() for log in logs.items],
@@ -327,6 +370,7 @@ def get_verification_history():
             'current_page': page,
             'per_page': per_page
         }), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -368,40 +412,6 @@ def internal_error(error):
 def too_large(error):
     return jsonify({'error': 'File too large'}), 413
 
-@app.route('/api/ocr-extract', methods=['POST'])
-def ocr_extract():
-    """Extract certificate details from uploaded file using OCR"""
-    if not session.get('admin_logged_in'):
-        return jsonify({'error': 'Admin access required'}), 401
-
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-
-    if not allowed_file(file.filename):
-        return jsonify({'error': 'File type not allowed'}), 400
-
-    filename = secure_filename(file.filename)
-    temp_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(temp_path)
-
-    try:
-        raw_text, extracted_data = ocr_processor.process_document(temp_path)
-        validation = ocr_processor.validate_extraction_quality(extracted_data)
-
-        return jsonify({
-            'extracted_data': extracted_data,
-            'raw_text': raw_text,
-            'validation': validation
-        }), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
 
 # Health check
 @app.route('/api/health')
@@ -409,7 +419,8 @@ def health_check():
     """Health check endpoint"""
     try:
         # Test database connection
-        db.session.execute('SELECT 1')
+        from sqlalchemy import text
+        db.session.execute(text('SELECT 1'))
         return jsonify({
             'status': 'healthy',
             'timestamp': datetime.utcnow().isoformat(),
@@ -427,6 +438,5 @@ if __name__ == '__main__':
     # Create tables if they don't exist
     with app.app_context():
         db.create_all()
-
     # Run the application
     app.run(debug=True, host='0.0.0.0', port=5000)

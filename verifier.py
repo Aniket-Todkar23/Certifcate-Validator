@@ -73,10 +73,10 @@ class CertificateVerifier:
             if similarity < self.verification_thresholds['name_similarity']:
                 anomalies.append('Mother name mismatch')
 
-        if extracted_data.get('college_name') and certificate.institution:
+        if extracted_data.get('college_name') and certificate.college_name:
             similarity = fuzz.ratio(
                 extracted_data['college_name'].lower(),
-                certificate.institution.name.lower()
+                certificate.college_name.lower()
             )
             confidence_factors.append(0.9 if similarity >= self.verification_thresholds['institution_similarity'] else 0.4)
             if similarity < self.verification_thresholds['institution_similarity']:

@@ -2,154 +2,104 @@
 
 {% block title %}Certificate Verification - Authenticity Validator{% endblock %}
 
-{% block content %}
-<!-- Hero Section -->
-<div class="hero-section">
+{% block header %}
+<div class="header">
     <div class="container">
-        <h1 class="text-center">
-            <i class="fas fa-shield-alt me-2"></i>
-            Authenticity Validator for Academia
-        </h1>
-        <p class="text-center mb-0">
-            Secure and reliable certificate verification system powered by AI and blockchain technology
-        </p>
+        <h1>Certificate Authenticity Validator</h1>
+        <p>Government of Jharkhand - Digital Certificate Verification System</p>
+        <p class="text-small">Secure and reliable certificate verification powered by AI technology</p>
     </div>
 </div>
+{% endblock %}
+
+{% block content %}
 
 <div class="container">
-    <!-- Features -->
-    <div class="row mb-4">
-        <div class="col-md-3 col-sm-6">
-            <div class="feature-box">
-                <i class="fas fa-robot feature-icon"></i>
-                <h5>AI-Powered OCR</h5>
-                <p class="text-muted">Advanced text extraction from images and PDFs</p>
+    <!-- Features Grid -->
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-robot"></i>
             </div>
+            <h3>AI-Powered OCR</h3>
+            <p>Advanced text extraction from certificate images and PDFs with high accuracy</p>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="feature-box">
-                <i class="fas fa-search feature-icon"></i>
-                <h5>Smart Detection</h5>
-                <p class="text-muted">Identify fake certificates with high accuracy</p>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-search"></i>
             </div>
+            <h3>Smart Detection</h3>
+            <p>Identify fraudulent certificates using machine learning algorithms</p>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="feature-box">
-                <i class="fas fa-database feature-icon"></i>
-                <h5>Verified Database</h5>
-                <p class="text-muted">Cross-verify with official institution records</p>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-database"></i>
             </div>
+            <h3>Verified Database</h3>
+            <p>Cross-verify with official institution records and databases</p>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="feature-box">
-                <i class="fas fa-clock feature-icon"></i>
-                <h5>Instant Results</h5>
-                <p class="text-muted">Get verification results in seconds</p>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-clock"></i>
             </div>
+            <h3>Instant Results</h3>
+            <p>Get comprehensive verification results in seconds, not hours</p>
         </div>
     </div>
     
     <!-- Upload Section -->
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-upload me-2"></i>
-                    Upload Certificate for Verification
-                </div>
-                <div class="card-body">
-                    <form id="uploadForm" enctype="multipart/form-data">
-                        <div class="upload-area" id="uploadArea">
-                            <i class="fas fa-cloud-upload-alt fa-4x text-muted mb-3"></i>
-                            <h4>Drag & Drop Certificate Here</h4>
-                            <p class="text-muted">or click to browse</p>
-                            <input type="file" id="certificateFile" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff" style="display: none;">
-                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('certificateFile').click()">
-                                <i class="fas fa-folder-open me-2"></i>
-                                Choose File
-                            </button>
-                            <p class="text-muted mt-3 mb-0">
-                                <small>Supported formats: PDF, JPG, PNG, GIF, BMP, TIFF (Max size: 16MB)</small>
-                            </p>
+    <div class="upload-container">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-upload me-2"></i>
+                Upload Certificate for Verification
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
                         </div>
-                        
-                        <div id="fileInfo" class="alert alert-info mt-3" style="display: none;">
-                            <i class="fas fa-file me-2"></i>
-                            <span id="fileName"></span>
-                            <button type="button" class="btn-close float-end" onclick="clearFile()"></button>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" id="verifyBtn" style="display: none;">
-                            <i class="fas fa-check-circle me-2"></i>
-                            Verify Certificate
+                        <div class="upload-title">Drag & Drop Certificate Here</div>
+                        <div class="upload-subtitle">or click to browse files</div>
+                        <input type="file" id="certificateFile" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff" style="display: none;">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('certificateFile').click()">
+                            <i class="fas fa-folder-open me-2"></i>
+                            Choose File
                         </button>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Loading Section -->
-            <div id="loadingSection" class="card mt-4" style="display: none;">
-                <div class="card-body text-center py-5">
-                    <div class="spinner-border spinner-border-lg mb-3" role="status">
-                        <span class="visually-hidden">Processing...</span>
-                    </div>
-                    <h5>Processing Certificate...</h5>
-                    <p class="text-muted mb-0">Please wait while we verify your certificate</p>
-                </div>
-            </div>
-            
-            <!-- Results Section -->
-            <div id="resultsSection" class="card mt-4" style="display: none;">
-                <div class="card-header">
-                    <i class="fas fa-clipboard-check me-2"></i>
-                    Verification Results
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <span id="statusBadge" class="status-badge"></span>
+                        <p class="form-text text-center">
+                            Supported formats: PDF, JPG, PNG, GIF, BMP, TIFF (Max size: 16MB)
+                        </p>
                     </div>
                     
-                    <!-- Confidence Score -->
-                    <div class="mb-4">
-                        <h6>Confidence Score</h6>
-                        <div class="progress confidence-bar">
-                            <div id="confidenceBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted">Confidence: <span id="confidenceText">0%</span></small>
+                    <div id="fileInfo" class="alert alert-info mt-3" style="display: none;">
+                        <i class="fas fa-file me-2"></i>
+                        <span id="fileName"></span>
+                        <button type="button" class="btn-close float-end" onclick="clearFile()"></button>
                     </div>
                     
-                    <!-- Extracted Data -->
-                    <div class="mb-4">
-                        <h6>Extracted Information</h6>
-                        <table class="table table-sm">
-                            <tbody id="extractedData"></tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Anomalies -->
-                    <div id="anomaliesSection" class="mb-4" style="display: none;">
-                        <h6>Detected Anomalies</h6>
-                        <ul id="anomaliesList" class="list-group"></ul>
-                    </div>
-                    
-                    <!-- Recommendations -->
-                    <div id="recommendationsSection" class="mb-4">
-                        <h6>Recommendations</h6>
-                        <ul id="recommendationsList" class="list-group"></ul>
-                    </div>
-                    
-                    <!-- Verification ID -->
-                    <div class="text-center">
-                        <small class="text-muted">Verification ID: <span id="verificationId"></span></small>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                        <i class="fas fa-redo me-2"></i>
-                        Verify Another Certificate
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" id="verifyBtn" style="display: none;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Verify Certificate
                     </button>
+                </form>
+            </div>
+        </div>
+            
+        <!-- Loading Section -->
+        <div id="loadingSection" class="results-container" style="display: none;">
+            <div class="card">
+                <div class="card-body text-center p-4">
+                    <div class="spinner"></div>
+                    <h4 class="mt-3">Processing Certificate...</h4>
+                    <p class="text-muted">Please wait while we verify your certificate</p>
                 </div>
             </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-container" style="display: none;">
+            <!-- Results will be inserted here by JavaScript -->
         </div>
     </div>
 </div>
@@ -164,43 +114,55 @@
     const verifyBtn = document.getElementById('verifyBtn');
     const fileInfo = document.getElementById('fileInfo');
     const fileName = document.getElementById('fileName');
+    const resultsSection = document.getElementById('resultsSection');
+    const loadingSection = document.getElementById('loadingSection');
     
     // Drag and drop
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
         
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            fileInput.files = files;
-            handleFileSelect();
-        }
-    });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+    }
     
-    fileInput.addEventListener('change', handleFileSelect);
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
+    }
     
     function handleFileSelect() {
-        const file = fileInput.files[0];
-        if (file) {
-            fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
-            fileInfo.style.display = 'block';
-            verifyBtn.style.display = 'block';
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            if (fileName) {
+                fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+            }
+            if (fileInfo) {
+                fileInfo.style.display = 'block';
+            }
+            if (verifyBtn) {
+                verifyBtn.style.display = 'block';
+            }
         }
     }
     
     function clearFile() {
-        fileInput.value = '';
-        fileInfo.style.display = 'none';
-        verifyBtn.style.display = 'none';
+        if (fileInput) fileInput.value = '';
+        if (fileInfo) fileInfo.style.display = 'none';
+        if (verifyBtn) verifyBtn.style.display = 'none';
     }
     
     function formatFileSize(bytes) {
@@ -212,130 +174,197 @@
     }
     
     // Form submission
-    uploadForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const file = fileInput.files[0];
-        if (!file) {
-            alert('Please select a certificate file');
-            return;
-        }
-        
-        const formData = new FormData();
-        formData.append('certificate', file);
-        
-        // Show loading
-        document.getElementById('loadingSection').style.display = 'block';
-        document.getElementById('resultsSection').style.display = 'none';
-        verifyBtn.disabled = true;
-        
-        try {
-            const response = await fetch('/api/verify', {
-                method: 'POST',
-                body: formData
-            });
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            const data = await response.json();
-            
-            if (response.ok) {
-                displayResults(data);
-            } else {
-                alert('Error: ' + (data.error || 'Verification failed'));
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a certificate file');
+                return;
             }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            document.getElementById('loadingSection').style.display = 'none';
-            verifyBtn.disabled = false;
-        }
-    });
+            
+            const formData = new FormData();
+            formData.append('certificate', file);
+            
+            if (loadingSection) loadingSection.style.display = 'block';
+            if (resultsSection) resultsSection.style.display = 'none';
+            verifyBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + (data.error || 'Verification failed'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                if (loadingSection) loadingSection.style.display = 'none';
+                verifyBtn.disabled = false;
+            }
+        });
+    }
     
     function displayResults(data) {
-        const resultsSection = document.getElementById('resultsSection');
-        
         // Status badge
         const statusBadge = document.getElementById('statusBadge');
-        statusBadge.className = 'status-badge status-' + data.status.toLowerCase();
-        statusBadge.textContent = data.status;
-        
-        // Confidence score
+        if (statusBadge) {
+            statusBadge.className = 'status-badge status-' + data.status.toLowerCase();
+            statusBadge.textContent = data.status;
+        }
+
+        // Confidence score (declare once)
         const confidence = Math.round(data.confidence * 100);
-        document.getElementById('confidenceBar').style.width = confidence + '%';
-        document.getElementById('confidenceText').textContent = confidence + '%';
-        
-        // Color confidence bar based on score
-        const confidenceBar = document.getElementById('confidenceBar');
-        if (confidence >= 80) {
-            confidenceBar.className = 'progress-bar bg-success';
-        } else if (confidence >= 50) {
-            confidenceBar.className = 'progress-bar bg-warning';
-        } else {
-            confidenceBar.className = 'progress-bar bg-danger';
+
+        const confBar = document.getElementById('confidenceBar');
+        const confText = document.getElementById('confidenceText');
+        if (confBar && confText) {
+            confBar.style.width = confidence + '%';
+            confText.textContent = confidence + '%';
+            if (confidence >= 80) {
+                confBar.className = 'progress-bar bg-success';
+            } else if (confidence >= 50) {
+                confBar.className = 'progress-bar bg-warning';
+            } else {
+                confBar.className = 'progress-bar bg-danger';
+            }
         }
         
+        // Create result card
+        const resultCard = document.createElement('div');
+        resultCard.className = `result-card result-${data.status.toLowerCase()}`;
+        
+        // Status header
+        const statusHeader = document.createElement('div');
+        statusHeader.className = 'result-header';
+        statusHeader.innerHTML = `
+            <div class="result-icon">${getStatusIcon(data.status)}</div>
+            <div>
+                <h3>${getStatusTitle(data.status)}</h3>
+                <p class="text-muted">Verification ID: ${data.verification_id}</p>
+            </div>
+        `;
+        resultCard.appendChild(statusHeader);
+        
+        // Confidence meter
+        const confidenceMeter = document.createElement('div');
+        confidenceMeter.innerHTML = `
+            <h4>Confidence Score: ${confidence}%</h4>
+            <div class="confidence-bar">
+                <div class="confidence-fill" style="width: ${confidence}%"></div>
+            </div>
+        `;
+        resultCard.appendChild(confidenceMeter);
+        
         // Extracted data
-        const extractedData = document.getElementById('extractedData');
-        extractedData.innerHTML = '';
-        
-        const fields = {
-            'student_name': 'Student Name',
-            'certificate_number': 'Certificate Number',
-            'institution': 'Institution',
-            'course_name': 'Course',
-            'year': 'Year of Passing',
-            'percentage': 'Percentage',
-            'cgpa': 'CGPA',
-            'roll_number': 'Roll Number'
-        };
-        
-        for (const [key, label] of Object.entries(fields)) {
-            if (data.details.extracted_data[key]) {
-                const row = extractedData.insertRow();
-                row.innerHTML = `
-                    <td><strong>${label}:</strong></td>
-                    <td>${data.details.extracted_data[key]}</td>
-                `;
+        if (data.details && data.details.extracted_data) {
+            const extractedSection = document.createElement('div');
+            extractedSection.innerHTML = '<h4>Extracted Information:</h4>';
+            const table = document.createElement('table');
+            table.className = 'table';
+            const fields = {
+                'seat_no': 'Seat Number',
+                'student_name': 'Student Name',
+                'mother_name': 'Mother Name',
+                'college_name': 'College Name',
+                'subject': 'Subject',
+                'sgpa': 'SGPA',
+                'result_date': 'Result Date'
+            };
+            for (const [key, label] of Object.entries(fields)) {
+                if (data.details.extracted_data[key]) {
+                    const row = table.insertRow();
+                    row.innerHTML = `<td><strong>${label}</strong></td><td>${data.details.extracted_data[key]}</td>`;
+                }
             }
+            extractedSection.appendChild(table);
+            resultCard.appendChild(extractedSection);
         }
         
         // Anomalies
-        if (data.details.anomalies && data.details.anomalies.length > 0) {
-            document.getElementById('anomaliesSection').style.display = 'block';
-            const anomaliesList = document.getElementById('anomaliesList');
-            anomaliesList.innerHTML = '';
-            
+        if (data.details && data.details.anomalies && data.details.anomalies.length > 0) {
+            const anomaliesSection = document.createElement('div');
+            anomaliesSection.innerHTML = '<h4>Issues Detected:</h4>';
+            const anomaliesList = document.createElement('ul');
+            anomaliesList.className = 'list-group';
             data.details.anomalies.forEach(anomaly => {
                 const li = document.createElement('li');
                 li.className = 'list-group-item list-group-item-warning';
                 li.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${anomaly}`;
                 anomaliesList.appendChild(li);
             });
-        } else {
-            document.getElementById('anomaliesSection').style.display = 'none';
+            anomaliesSection.appendChild(anomaliesList);
+            resultCard.appendChild(anomaliesSection);
         }
         
         // Recommendations
-        const recommendationsList = document.getElementById('recommendationsList');
-        recommendationsList.innerHTML = '';
+        if (data.recommendations && data.recommendations.length > 0) {
+            const recSection = document.createElement('div');
+            recSection.innerHTML = '<h4>Recommendations:</h4>';
+            const recList = document.createElement('ul');
+            recList.className = 'list-group';
+            data.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `<i class="fas fa-info-circle me-2 text-primary"></i>${rec}`;
+                recList.appendChild(li);
+            });
+            recSection.appendChild(recList);
+            resultCard.appendChild(recSection);
+        }
         
-        data.recommendations.forEach(rec => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item';
-            li.innerHTML = `<i class="fas fa-info-circle me-2 text-primary"></i>${rec}`;
-            recommendationsList.appendChild(li);
-        });
-        
-        // Verification ID
-        document.getElementById('verificationId').textContent = data.verification_id;
+        // Reset button
+        const resetButton = document.createElement('div');
+        resetButton.className = 'text-center mt-4';
+        resetButton.innerHTML = `
+            <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+                <i class="fas fa-redo me-2"></i>
+                Verify Another Certificate
+            </button>
+        `;
+        resultCard.appendChild(resetButton);
         
         // Show results
-        resultsSection.style.display = 'block';
+        if (resultsSection) {
+            resultsSection.innerHTML = '';
+            resultsSection.appendChild(resultCard);
+            resultsSection.style.display = 'block';
+        }
+    }
+    
+    // Helpers
+    function getStatusIcon(status) {
+        switch(status) {
+            case 'AUTHENTIC': return '<i class="fas fa-check"></i>';
+            case 'SUSPICIOUS': return '<i class="fas fa-exclamation-triangle"></i>';
+            case 'FAKE': return '<i class="fas fa-times"></i>';
+            case 'ERROR': return '<i class="fas fa-question"></i>';
+            default: return '<i class="fas fa-question"></i>';
+        }
+    }
+    
+    function getStatusTitle(status) {
+        switch(status) {
+            case 'AUTHENTIC': return 'Certificate Appears Authentic';
+            case 'SUSPICIOUS': return 'Certificate Requires Review';
+            case 'FAKE': return 'Certificate Appears Fraudulent';
+            case 'ERROR': return 'Verification Error';
+            default: return 'Unknown Status';
+        }
     }
     
     function resetForm() {
         clearFile();
-        document.getElementById('resultsSection').style.display = 'none';
-        uploadForm.reset();
+        if (resultsSection) resultsSection.style.display = 'none';
+        if (uploadForm) uploadForm.reset();
     }
 </script>
 {% endblock %}
