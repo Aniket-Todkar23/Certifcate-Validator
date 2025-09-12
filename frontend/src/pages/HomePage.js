@@ -169,71 +169,77 @@ const HomePage = () => {
         description="Secure and reliable certificate verification powered by AI technology"
       />
       
-      <div className="container">
+      <div className="max-w-7xl mx-auto px-6 flex-1">
         {/* Features Grid */}
-        <div className="feature-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-12">
           {features.map((feature, index) => (
-            <div key={index} className="feature-card">
-              <div className="feature-icon">
+            <div key={index} className="glass-card p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-blue-500/50 hover:bg-slate-800/90">
+              <div className="w-10 h-10 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg text-white">
                 {feature.icon}
               </div>
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
+              <h3 className="text-lg font-semibold mb-2 text-slate-100">{feature.title}</h3>
+              <p className="text-slate-300 text-sm">{feature.description}</p>
             </div>
           ))}
         </div>
 
         {/* Upload Section */}
-        <div className="upload-container">
-          <div className="card">
-            <div className="card-header">
+        <div className="max-w-3xl mx-auto my-12">
+          <div className="glass-card">
+            <div className="bg-slate-700/50 px-6 py-4 border-b border-slate-600/30 flex items-center gap-2 font-semibold text-slate-100">
               <CloudArrowUpIcon className="w-5 h-5" />
               Upload Certificate for Verification
             </div>
-            <div className="card-body">
+            <div className="p-6">
               <form onSubmit={handleSubmit}>
                 <div 
-                  className={`upload-area ${dragActive ? 'dragover' : ''}`}
+                  className={`border-2 border-dashed rounded-lg p-12 text-center bg-slate-700/30 transition-all duration-300 cursor-pointer relative ${
+                    dragActive 
+                      ? 'border-blue-500 bg-slate-600/60 shadow-lg shadow-blue-500/20 -translate-y-1' 
+                      : 'border-slate-600/40 hover:border-blue-500 hover:bg-slate-600/60 hover:shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1'
+                  }`}
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <div className="upload-icon">
-                    <CloudArrowUpIcon className="w-8 h-8" />
+                  <div className={`text-4xl mb-4 transition-all duration-300 ${
+                    dragActive ? 'text-blue-500 scale-110' : 'text-slate-400 hover:text-blue-500 hover:scale-110'
+                  }`}>
+                    <CloudArrowUpIcon className="w-8 h-8 mx-auto" />
                   </div>
-                  <div className="upload-title">Drag & Drop Certificate Here</div>
-                  <div className="upload-subtitle">or click to browse files</div>
+                  <div className="text-xl font-semibold text-slate-100 mb-2">Drag & Drop Certificate Here</div>
+                  <div className="text-slate-300 mb-6">or click to browse files</div>
                   
                   <input
                     ref={fileInputRef}
                     type="file"
                     onChange={handleFileInputChange}
                     accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff"
-                    style={{ display: 'none' }}
+                    className="hidden"
                   />
                   
-                  <button type="button" className="btn btn-primary btn-lg">
+                  <button type="button" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/30 btn-glow">
                     <FolderOpenIcon className="w-5 h-5" />
                     Choose File
                   </button>
                   
-                  <p className="form-text text-center">
+                  <p className="mt-4 text-xs text-slate-400 text-center">
                     Supported formats: PDF, JPG, PNG, GIF, BMP, TIFF (Max size: 16MB)
                   </p>
                 </div>
 
                 {file && (
-                  <div className="alert alert-info mt-3">
-                    <div className="d-flex justify-between align-center">
-                      <span>
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-6 backdrop-blur-md">
+                    <div className="flex justify-between items-center">
+                      <span className="text-blue-400 flex items-center gap-2">
                         📄 {file.name} ({formatFileSize(file.size)})
                       </span>
                       <button 
                         type="button" 
                         onClick={clearFile}
-                        className="btn btn-sm btn-secondary"
+                        className="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-slate-300 hover:text-white rounded text-sm transition-colors"
                       >
                         ✕
                       </button>
@@ -244,11 +250,22 @@ const HomePage = () => {
                 {file && (
                   <button 
                     type="submit" 
-                    className="btn btn-primary btn-lg w-100 mt-3"
+                    className={`w-full mt-6 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-green-500/30 btn-glow inline-flex items-center justify-center gap-2 ${
+                      isLoading ? 'opacity-60 cursor-not-allowed' : ''
+                    }`}
                     disabled={isLoading}
                   >
-                    <CheckCircleIcon className="w-5 h-5" />
-                    {isLoading ? 'Verifying...' : 'Verify Certificate'}
+                    {isLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircleIcon className="w-5 h-5" />
+                        Verify Certificate
+                      </>
+                    )}
                   </button>
                 )}
               </form>
@@ -257,12 +274,12 @@ const HomePage = () => {
 
           {/* Loading Section */}
           {isLoading && (
-            <div className="results-container">
-              <div className="card">
-                <div className="card-body text-center p-4">
-                  <div className="spinner"></div>
-                  <h4 className="mt-3">Processing Certificate...</h4>
-                  <p className="text-muted">Please wait while we verify your certificate</p>
+            <div className="max-w-3xl mx-auto mt-8">
+              <div className="glass-card">
+                <div className="p-8 text-center">
+                  <div className="w-12 h-12 border-4 border-slate-600 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+                  <h4 className="text-xl font-semibold text-slate-100 mb-2">Processing Certificate...</h4>
+                  <p className="text-slate-400">Please wait while we verify your certificate</p>
                 </div>
               </div>
             </div>
@@ -270,25 +287,35 @@ const HomePage = () => {
 
           {/* Results Section */}
           {results && !isLoading && (
-            <div className="results-container">
-              <div className={`result-card result-${results.status.toLowerCase()}`}>
+            <div className="max-w-3xl mx-auto mt-8">
+              <div className={`glass-card p-6 border-2 ${
+                results.status.toLowerCase() === 'authentic' ? 'border-green-500/50 bg-green-500/5' :
+                results.status.toLowerCase() === 'suspicious' ? 'border-yellow-500/50 bg-yellow-500/5' :
+                results.status.toLowerCase() === 'fake' ? 'border-red-500/50 bg-red-500/5' :
+                'border-slate-500/50 bg-slate-500/5'
+              }`}>
                 {/* Status header */}
-                <div className="result-header">
-                  <div className="result-icon">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className={`w-12 h-12 flex items-center justify-center rounded-full text-xl ${
+                    results.status.toLowerCase() === 'authentic' ? 'bg-gradient-to-br from-green-500 to-green-600 text-white' :
+                    results.status.toLowerCase() === 'suspicious' ? 'bg-gradient-to-br from-yellow-500 to-yellow-600 text-white' :
+                    results.status.toLowerCase() === 'fake' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white' :
+                    'bg-gradient-to-br from-slate-500 to-slate-600 text-white'
+                  }`}>
                     {getStatusIcon(results.status)}
                   </div>
                   <div>
-                    <h3>{getStatusTitle(results.status)}</h3>
-                    <p className="text-muted">Verification ID: {results.verification_id}</p>
+                    <h3 className="text-2xl font-bold text-slate-100">{getStatusTitle(results.status)}</h3>
+                    <p className="text-slate-400">Verification ID: {results.verification_id}</p>
                   </div>
                 </div>
 
                 {/* Confidence meter */}
-                <div>
-                  <h4>Confidence Score: {Math.round(results.confidence * 100)}%</h4>
-                  <div className="confidence-bar">
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-slate-100 mb-3">Confidence Score: {Math.round(results.confidence * 100)}%</h4>
+                  <div className="bg-slate-600/30 h-3 rounded-full overflow-hidden">
                     <div 
-                      className="confidence-fill" 
+                      className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all duration-500 ease-out" 
                       style={{ width: `${Math.round(results.confidence * 100)}%` }}
                     ></div>
                   </div>
@@ -296,66 +323,68 @@ const HomePage = () => {
 
                 {/* Extracted data */}
                 {results.details?.extracted_data && (
-                  <div className="mt-4">
-                    <h4>Extracted Information:</h4>
-                    <table className="table">
-                      <tbody>
-                        {Object.entries({
-                          'seat_no': 'Seat Number',
-                          'student_name': 'Student Name', 
-                          'mother_name': 'Mother Name',
-                          'college_name': 'College Name',
-                          'subject': 'Subject',
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-slate-100 mb-4">Extracted Information:</h4>
+                    <div className="bg-slate-700/30 rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <tbody>
+                          {Object.entries({
+                            'seat_no': 'Seat Number',
+                            'student_name': 'Student Name', 
+                            'mother_name': 'Mother Name',
+                            'college_name': 'College Name',
+                            'subject': 'Subject',
                           'sgpa': 'SGPA',
                           'result_date': 'Result Date'
                         }).map(([key, label]) => (
                           results.details.extracted_data[key] && (
-                            <tr key={key}>
-                              <td><strong>{label}</strong></td>
-                              <td>{results.details.extracted_data[key]}</td>
+                            <tr key={key} className="border-b border-slate-600/30 last:border-b-0 hover:bg-slate-600/20">
+                              <td className="px-4 py-3 text-sm font-medium text-slate-300 uppercase tracking-wide">{label}</td>
+                              <td className="px-4 py-3 text-slate-100">{results.details.extracted_data[key]}</td>
                             </tr>
                           )
                         ))}
                       </tbody>
                     </table>
                   </div>
+                  </div>
                 )}
 
                 {/* Anomalies */}
                 {results.details?.anomalies?.length > 0 && (
-                  <div className="mt-4">
-                    <h4>Issues Detected:</h4>
-                    <ul className="list-group">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-slate-100 mb-4">Issues Detected:</h4>
+                    <div className="space-y-2">
                       {results.details.anomalies.map((anomaly, index) => (
-                        <li key={index} className="list-group-item list-group-item-warning">
-                          <ExclamationTriangleIcon className="w-4 h-4 text-warning" />
-                          {anomaly}
-                        </li>
+                        <div key={index} className="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                          <ExclamationTriangleIcon className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-slate-200">{anomaly}</span>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
 
                 {/* Recommendations */}
                 {results.recommendations?.length > 0 && (
-                  <div className="mt-4">
-                    <h4>Recommendations:</h4>
-                    <ul className="list-group">
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-slate-100 mb-4">Recommendations:</h4>
+                    <div className="space-y-2">
                       {results.recommendations.map((rec, index) => (
-                        <li key={index} className="list-group-item">
-                          <CheckCircleIcon className="w-4 h-4 text-primary" />
-                          {rec}
-                        </li>
+                        <div key={index} className="flex items-start gap-3 p-4 bg-slate-700/30 border border-slate-600/30 rounded-lg">
+                          <CheckCircleIcon className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-slate-200">{rec}</span>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
 
                 {/* Reset button */}
-                <div className="text-center mt-4">
+                <div className="text-center mt-6">
                   <button 
                     type="button" 
-                    className="btn btn-secondary btn-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-white rounded-lg font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg inline-flex items-center gap-2"
                     onClick={resetForm}
                   >
                     🔄 Verify Another Certificate

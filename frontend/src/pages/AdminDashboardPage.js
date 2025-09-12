@@ -168,10 +168,10 @@ const AdminDashboardPage = ({ adminUser }) => {
           subtitle="Certificate Management & Verification Analytics"
           description="Manage certificates, institutions, and monitor verification activities"
         />
-        <div className="container">
-          <div className="text-center mt-4">
-            <div className="spinner"></div>
-            <p>Loading dashboard...</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mt-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <p className="mt-4 text-slate-300">Loading dashboard...</p>
           </div>
         </div>
       </>
@@ -186,100 +186,114 @@ const AdminDashboardPage = ({ adminUser }) => {
         description="Manage certificates, institutions, and monitor verification activities"
       />
       
-      <div className="container mt-4">
-        <div className="d-flex justify-between align-center mb-4">
-          <h2>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-slate-100 flex items-center">
             <ChartBarIcon className="w-6 h-6 inline mr-2" />
             Dashboard Overview
           </h2>
-          <div className="text-muted">
+          <div className="text-slate-400">
             Welcome, {adminUser || 'Administrator'}
           </div>
         </div>
 
         {/* Statistics Grid */}
-        <div className="stats-grid mb-4">
-          <div className="stat-card" style={{ background: 'linear-gradient(135deg, var(--success), #0d7d4a)' }}>
-            <div className="feature-icon" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>
-              <CheckCircleIcon className="w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Authentic Certificates - Green */}
+          <div className="glass-card p-6 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 hover:from-emerald-400 hover:via-green-400 hover:to-teal-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-emerald-500/25">
+            <div className="flex items-center justify-center w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl mb-4 shadow-inner">
+              <CheckCircleIcon className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
-            <h3>{stats?.status_distribution?.AUTHENTIC || 0}</h3>
-            <h5>Authentic</h5>
-            <p>Verified as authentic</p>
+            <h3 className="text-3xl font-bold text-white mb-1 drop-shadow-sm">{stats?.status_distribution?.AUTHENTIC || 0}</h3>
+            <h5 className="text-lg font-semibold text-white/95 mb-2">Authentic</h5>
+            <p className="text-white/85 text-sm">Verified as authentic</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg pointer-events-none"></div>
           </div>
           
-          <div className="stat-card" style={{ background: 'linear-gradient(135deg, var(--warning), #d97706)' }}>
-            <div className="feature-icon" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>
-              <ExclamationTriangleIcon className="w-6 h-6" />
+          {/* Suspicious Certificates - Orange/Amber */}
+          <div className="glass-card p-6 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 hover:from-amber-400 hover:via-orange-400 hover:to-red-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-amber-500/25">
+            <div className="flex items-center justify-center w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl mb-4 shadow-inner">
+              <ExclamationTriangleIcon className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
-            <h3>{stats?.status_distribution?.SUSPICIOUS || 0}</h3>
-            <h5>Suspicious</h5>
-            <p>Require manual review</p>
+            <h3 className="text-3xl font-bold text-white mb-1 drop-shadow-sm">{stats?.status_distribution?.SUSPICIOUS || 0}</h3>
+            <h5 className="text-lg font-semibold text-white/95 mb-2">Suspicious</h5>
+            <p className="text-white/85 text-sm">Require manual review</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg pointer-events-none"></div>
           </div>
           
-          <div className="stat-card" style={{ background: 'linear-gradient(135deg, var(--danger), #dc2626)' }}>
-            <div className="feature-icon" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>
-              <XCircleIcon className="w-6 h-6" />
+          {/* Fraudulent Certificates - Red */}
+          <div className="glass-card p-6 bg-gradient-to-br from-red-500 via-rose-500 to-pink-600 hover:from-red-400 hover:via-rose-400 hover:to-pink-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-red-500/25">
+            <div className="flex items-center justify-center w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl mb-4 shadow-inner">
+              <XCircleIcon className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
-            <h3>{stats?.status_distribution?.FAKE || 0}</h3>
-            <h5>Fraudulent</h5>
-            <p>Detected as fake</p>
+            <h3 className="text-3xl font-bold text-white mb-1 drop-shadow-sm">{stats?.status_distribution?.FAKE || 0}</h3>
+            <h5 className="text-lg font-semibold text-white/95 mb-2">Fraudulent</h5>
+            <p className="text-white/85 text-sm">Detected as fake</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg pointer-events-none"></div>
           </div>
           
-          <div className="stat-card" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
-            <div className="feature-icon" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>
-              <ChartBarIcon className="w-6 h-6" />
+          {/* Total Verifications - Blue/Purple */}
+          <div className="glass-card p-6 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 hover:from-blue-400 hover:via-indigo-400 hover:to-purple-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
+            <div className="flex items-center justify-center w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl mb-4 shadow-inner">
+              <ChartBarIcon className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
-            <h3>{stats?.total_verifications || 0}</h3>
-            <h5>Total Verifications</h5>
-            <p>Last 30 days</p>
+            <h3 className="text-3xl font-bold text-white mb-1 drop-shadow-sm">{stats?.total_verifications || 0}</h3>
+            <h5 className="text-lg font-semibold text-white/95 mb-2">Total Verifications</h5>
+            <p className="text-white/85 text-sm">Last 30 days</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg pointer-events-none"></div>
           </div>
         </div>
 
         {/* OCR Upload Section */}
-        <div className="card mt-4">
-          <div className="card-header">
-            <SparklesIcon className="w-5 h-5" />
-            OCR Document Extraction
+        <div className="glass-card mb-8">
+          <div className="border-b border-slate-600/30 p-6">
+            <h3 className="text-xl font-semibold text-slate-100 flex items-center">
+              <SparklesIcon className="w-5 h-5 mr-2" />
+              OCR Document Extraction
+            </h3>
           </div>
-          <div className="card-body">
-            <div className="upload-area" style={{ cursor: 'pointer', minHeight: 'auto', padding: '2rem' }}>
-              <div className="upload-icon" style={{ fontSize: '2rem', marginBottom: '1rem' }}>
-                <FolderOpenIcon className="w-8 h-8 mx-auto" />
+          <div className="p-6">
+            <div 
+              className="border-2 border-dashed border-slate-600/50 rounded-lg p-8 text-center cursor-pointer hover:border-primary-500/50 transition-colors duration-200"
+              onClick={() => ocrFileRef.current?.click()}
+            >
+              <div className="flex justify-center mb-4">
+                <FolderOpenIcon className="w-12 h-12 text-slate-400" />
               </div>
-              <div className="upload-title" style={{ fontSize: '1.1rem' }}>Upload Certificate for OCR Extraction</div>
-              <div className="upload-subtitle">Drag & drop or click to select PDF/Image files</div>
+              <div className="text-lg font-medium text-slate-200 mb-2">Upload Certificate for OCR Extraction</div>
+              <div className="text-sm text-slate-400 mb-4">Drag & drop or click to select PDF/Image files</div>
               
-              <form onSubmit={handleOcrUpload} style={{ marginTop: '1rem' }}>
+              <form onSubmit={handleOcrUpload} className="mt-4">
                 <input 
                   ref={ocrFileRef}
                   type="file" 
-                  className="form-control" 
+                  className="hidden" 
                   accept=".pdf,.png,.jpg,.jpeg,.bmp,.tiff,.gif" 
-                  style={{ display: 'none' }}
                   required 
                 />
-                <button 
-                  type="button" 
-                  className="btn btn-secondary"
-                  onClick={() => ocrFileRef.current?.click()}
-                >
-                  <FolderOpenIcon className="w-4 h-4" />
-                  Choose File
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary ms-2"
-                  disabled={ocrLoading}
-                >
-                  <SparklesIcon className="w-4 h-4" />
-                  {ocrLoading ? 'Extracting...' : 'Extract Data'}
-                </button>
+                <div className="flex gap-3 justify-center">
+                  <button 
+                    type="button" 
+                    className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+                    onClick={() => ocrFileRef.current?.click()}
+                  >
+                    <FolderOpenIcon className="w-4 h-4" />
+                    Choose File
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={ocrLoading}
+                  >
+                    <SparklesIcon className="w-4 h-4" />
+                    {ocrLoading ? 'Extracting...' : 'Extract Data'}
+                  </button>
+                </div>
               </form>
             </div>
             
             {ocrAlert && (
-              <div className={`alert alert-${ocrAlert.type} mt-3`}>
+              <div className={`p-4 rounded-lg mt-4 ${ocrAlert.type === 'success' ? 'bg-success-500/20 text-success-200 border border-success-500/30' : 'bg-danger-500/20 text-danger-200 border border-danger-500/30'}`}>
                 {ocrAlert.message}
               </div>
             )}
@@ -287,23 +301,25 @@ const AdminDashboardPage = ({ adminUser }) => {
         </div>
 
         {/* Add Certificate Section */}
-        <div className="card mt-4">
-          <div className="card-header">
-            <PlusCircleIcon className="w-5 h-5" />
-            Add New Certificate to Database
+        <div className="glass-card">
+          <div className="border-b border-slate-600/30 p-6">
+            <h3 className="text-xl font-semibold text-slate-100 flex items-center">
+              <PlusCircleIcon className="w-5 h-5 mr-2" />
+              Add New Certificate to Database
+            </h3>
           </div>
-          <div className="card-body">
-            <div className="row">
-              <div className="col-lg-8">
+          <div className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
                 <form onSubmit={handleCertificateSubmit}>
-                  <div className="row">
-                    <div className="col-md-6 form-group">
-                      <label htmlFor="seat_no" className="form-label">
-                        Seat Number <span className="text-danger">*</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="seat_no" className="block text-sm font-medium text-slate-200 mb-2">
+                        Seat Number <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="seat_no"
                         name="seat_no"
                         value={certificateForm.seat_no}
@@ -312,13 +328,13 @@ const AdminDashboardPage = ({ adminUser }) => {
                         required
                       />
                     </div>
-                    <div className="col-md-6 form-group">
-                      <label htmlFor="student_name" className="form-label">
-                        Student Name <span className="text-danger">*</span>
+                    <div>
+                      <label htmlFor="student_name" className="block text-sm font-medium text-slate-200 mb-2">
+                        Student Name <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="student_name"
                         name="student_name"
                         value={certificateForm.student_name}
@@ -327,13 +343,13 @@ const AdminDashboardPage = ({ adminUser }) => {
                         required
                       />
                     </div>
-                    <div className="col-md-6 form-group">
-                      <label htmlFor="mother_name" className="form-label">
-                        Mother Name <span className="text-danger">*</span>
+                    <div>
+                      <label htmlFor="mother_name" className="block text-sm font-medium text-slate-200 mb-2">
+                        Mother Name <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="mother_name"
                         name="mother_name"
                         value={certificateForm.mother_name}
@@ -342,13 +358,13 @@ const AdminDashboardPage = ({ adminUser }) => {
                         required
                       />
                     </div>
-                    <div className="col-md-6 form-group">
-                      <label htmlFor="college_name" className="form-label">
-                        College Name <span className="text-danger">*</span>
+                    <div>
+                      <label htmlFor="college_name" className="block text-sm font-medium text-slate-200 mb-2">
+                        College Name <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="college_name"
                         name="college_name"
                         value={certificateForm.college_name}
@@ -357,31 +373,30 @@ const AdminDashboardPage = ({ adminUser }) => {
                         required
                       />
                     </div>
-                    <div className="col-md-6 form-group">
-                      <label htmlFor="subject" className="form-label">
-                        Subject <span className="text-danger">*</span>
+                    <div>
+                      <label htmlFor="subject" className="block text-sm font-medium text-slate-200 mb-2">
+                        Subject <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="subject"
                         name="subject"
                         value={certificateForm.subject}
                         onChange={handleFormChange}
                         placeholder="e.g., Information Technology"
-                        required
                       />
                     </div>
-                    <div className="col-md-6 form-group">
-                      <label htmlFor="sgpa" className="form-label">
-                        SGPA <span className="text-danger">*</span>
+                    <div>
+                      <label htmlFor="sgpa" className="block text-sm font-medium text-slate-200 mb-2">
+                        SGPA <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
                         max="10"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="sgpa"
                         name="sgpa"
                         value={certificateForm.sgpa}
@@ -390,13 +405,13 @@ const AdminDashboardPage = ({ adminUser }) => {
                         required
                       />
                     </div>
-                    <div className="col-md-12 form-group">
-                      <label htmlFor="result_date" className="form-label">
-                        Result Date <span className="text-danger">*</span>
+                    <div className="md:col-span-2">
+                      <label htmlFor="result_date" className="block text-sm font-medium text-slate-200 mb-2">
+                        Result Date <span className="text-danger-400">*</span>
                       </label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-colors duration-200"
                         id="result_date"
                         name="result_date"
                         value={certificateForm.result_date}
@@ -404,16 +419,16 @@ const AdminDashboardPage = ({ adminUser }) => {
                         placeholder="e.g., 31 January 2025"
                         required
                       />
-                      <div className="form-text">
+                      <div className="text-sm text-slate-400 mt-1">
                         Please enter date in format: DD Month YYYY (e.g., 31 January 2025)
                       </div>
                     </div>
                   </div>
 
-                  <div className="form-group mt-4">
+                  <div className="flex gap-4 mt-8">
                     <button 
                       type="submit" 
-                      className="btn btn-success btn-lg"
+                      className="px-6 py-3 bg-success-600 hover:bg-success-500 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={certLoading}
                     >
                       <PlusCircleIcon className="w-5 h-5" />
@@ -421,7 +436,7 @@ const AdminDashboardPage = ({ adminUser }) => {
                     </button>
                     <button 
                       type="button" 
-                      className="btn btn-secondary btn-lg ms-2"
+                      className="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
                       onClick={resetCertForm}
                     >
                       🔄 Reset Form
@@ -430,29 +445,31 @@ const AdminDashboardPage = ({ adminUser }) => {
                 </form>
               </div>
               
-              <div className="col-lg-4">
-                <div className="card">
-                  <div className="card-header">
-                    <LightBulbIcon className="w-4 h-4" />
-                    Tips
+              <div className="lg:col-span-1">
+                <div className="glass-card">
+                  <div className="border-b border-slate-600/30 p-4">
+                    <h4 className="text-lg font-semibold text-slate-100 flex items-center">
+                      <LightBulbIcon className="w-4 h-4 mr-2" />
+                      Tips
+                    </h4>
                   </div>
-                  <div className="card-body">
-                    <ul className="list-unstyled">
-                      <li className="mb-2">
-                        <LightBulbIcon className="w-4 h-4 text-warning inline mr-2" />
-                        Use OCR extraction to auto-fill form data
+                  <div className="p-4">
+                    <ul className="space-y-3 text-sm">
+                      <li className="flex items-start">
+                        <LightBulbIcon className="w-4 h-4 text-warning-400 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-slate-300">Use OCR extraction to auto-fill form data</span>
                       </li>
-                      <li className="mb-2">
-                        <CheckCircleIcon className="w-4 h-4 text-success inline mr-2" />
-                        Verify all fields before submitting
+                      <li className="flex items-start">
+                        <CheckCircleIcon className="w-4 h-4 text-success-400 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-slate-300">Verify all fields before submitting</span>
                       </li>
-                      <li className="mb-2">
-                        <MagnifyingGlassIcon className="w-4 h-4 text-info inline mr-2" />
-                        Ensure seat numbers are unique
+                      <li className="flex items-start">
+                        <MagnifyingGlassIcon className="w-4 h-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-slate-300">Ensure seat numbers are unique</span>
                       </li>
-                      <li>
-                        <CalendarIcon className="w-4 h-4 text-primary inline mr-2" />
-                        Use proper date format
+                      <li className="flex items-start">
+                        <CalendarIcon className="w-4 h-4 text-primary-400 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-slate-300">Use proper date format</span>
                       </li>
                     </ul>
                   </div>
@@ -461,7 +478,7 @@ const AdminDashboardPage = ({ adminUser }) => {
             </div>
 
             {certAlert && (
-              <div className={`alert alert-${certAlert.type} mt-3`}>
+              <div className={`p-4 rounded-lg mt-6 ${certAlert.type === 'success' ? 'bg-success-500/20 text-success-200 border border-success-500/30' : 'bg-danger-500/20 text-danger-200 border border-danger-500/30'}`}>
                 {certAlert.message}
               </div>
             )}

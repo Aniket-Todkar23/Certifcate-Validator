@@ -6,7 +6,6 @@ import HomePage from './pages/HomePage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import { apiService } from './services/api';
-import './styles/App.css';
 
 function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -49,10 +48,12 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="app">
-        <div className="container text-center" style={{ paddingTop: '50vh' }}>
-          <div className="spinner"></div>
-          <p>Loading...</p>
+      <div className="min-h-screen flex flex-col">
+        <div className="max-w-7xl mx-auto px-6 text-center flex-1 flex items-center justify-center">
+          <div>
+            <div className="w-10 h-10 border-4 border-slate-600 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -60,7 +61,7 @@ function App() {
 
   return (
     <Router>
-      <div className="app">
+      <div className="min-h-screen flex flex-col">
         <Navbar 
           isAdminLoggedIn={isAdminLoggedIn} 
           onLogout={handleLogout}

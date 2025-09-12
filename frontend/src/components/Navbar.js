@@ -10,18 +10,22 @@ const Navbar = ({ isAdminLoggedIn, onLogout }) => {
   };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <Link to="/" className="navbar-brand">
+    <nav className="bg-slate-800/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-slate-600/30">
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-16">
+        <Link to="/" className="flex items-center gap-3 text-slate-100 hover:text-blue-400 transition-colors font-semibold text-xl no-underline">
           <ShieldCheckIcon className="w-6 h-6" />
           Certificate Validator
         </Link>
         
-        <ul className="navbar-menu">
+        <ul className="flex items-center gap-4 list-none">
           <li>
             <Link 
               to="/" 
-              className={`navbar-link ${isActive('/') ? 'active' : ''}`}
+              className={`px-4 py-2 rounded-md transition-all font-medium text-sm no-underline ${
+                isActive('/') 
+                  ? 'text-blue-400 bg-slate-600/30' 
+                  : 'text-slate-300 hover:text-blue-400 hover:bg-slate-600/20 hover:-translate-y-0.5'
+              }`}
             >
               Home
             </Link>
@@ -31,7 +35,11 @@ const Navbar = ({ isAdminLoggedIn, onLogout }) => {
               <li>
                 <Link 
                   to="/admin" 
-                  className={`navbar-link ${isActive('/admin') ? 'active' : ''}`}
+                  className={`px-4 py-2 rounded-md transition-all font-medium text-sm no-underline ${
+                    isActive('/admin') 
+                      ? 'text-blue-400 bg-slate-600/30' 
+                      : 'text-slate-300 hover:text-blue-400 hover:bg-slate-600/20 hover:-translate-y-0.5'
+                  }`}
                 >
                   Admin Dashboard
                 </Link>
@@ -39,8 +47,7 @@ const Navbar = ({ isAdminLoggedIn, onLogout }) => {
               <li>
                 <button 
                   onClick={onLogout}
-                  className="navbar-link"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                  className="px-4 py-2 rounded-md transition-all font-medium text-sm bg-transparent border-none cursor-pointer text-slate-300 hover:text-blue-400 hover:bg-slate-600/20 hover:-translate-y-0.5"
                 >
                   Logout
                 </button>
@@ -48,7 +55,7 @@ const Navbar = ({ isAdminLoggedIn, onLogout }) => {
             </>
           ) : (
             <li>
-              <Link to="/admin/login" className="btn btn-primary">
+              <Link to="/admin/login" className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-md font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/30 no-underline">
                 Admin Login
               </Link>
             </li>
