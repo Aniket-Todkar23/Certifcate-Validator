@@ -1,0 +1,9 @@
+seat_no,student_name,mother_name,sgpa,result_date,subject
+S2024001,Alice Johnson,Mary Johnson,9.85,15-Mar-24,Computer Science
+S2024002,Bob Smith,Susan Smith,8.95,22-Mar-24,Electrical Engineering
+S2024003,Carol Davis,Linda Davis,9.12,05-Apr-24,Business Administration
+S2024004,David Wilson,Karen Wilson,8.76,12-Apr-24,Mechanical Engineering
+S2024005,Frank Miller,Nancy Miller,7.89,28-Apr-24,Physics
+S2024006,Helen Anderson,Dorothy Anderson,9.23,12-May-24,Mathematics
+S2024007,Ian Thomas,Lisa Thomas,8.67,20-May-24,Economics
+S2024008,Jack Jackson,Maria Jackson,9.01,25-May-24,History

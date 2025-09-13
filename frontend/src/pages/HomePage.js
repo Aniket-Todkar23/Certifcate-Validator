@@ -14,9 +14,10 @@ import {
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/solid';
 import Header from '../components/Header';
+import FAQ from '../components/FAQ';
 import { apiService } from '../services/api';
 
-const HomePage = () => {
+const HomePage = ({ isLoggedIn = false, user = null }) => {
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(null);
@@ -183,13 +184,15 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Upload Section */}
-        <div className="max-w-3xl mx-auto my-12">
-          <div className="glass-card">
-            <div className="bg-slate-700/50 px-6 py-4 border-b border-slate-600/30 flex items-center gap-2 font-semibold text-slate-100">
-              <CloudArrowUpIcon className="w-5 h-5" />
-              Upload Certificate for Verification
-            </div>
+        {/* Conditional Content - Upload for authenticated verifiers, FAQ for public */}
+        {isLoggedIn && user?.role === 'verifier' ? (
+          /* Upload Section - Only for authenticated verifiers */
+          <div className="max-w-3xl mx-auto my-12">
+            <div className="glass-card">
+              <div className="bg-slate-700/50 px-6 py-4 border-b border-slate-600/30 flex items-center gap-2 font-semibold text-slate-100">
+                <CloudArrowUpIcon className="w-5 h-5" />
+                Upload Certificate for Verification
+              </div>
             <div className="p-6">
               <form onSubmit={handleSubmit}>
                 <div 
@@ -393,7 +396,11 @@ const HomePage = () => {
               </div>
             </div>
           )}
-        </div>
+          </div>
+        ) : (
+          /* FAQ Section - For public users */
+          <FAQ />
+        )}
       </div>
     </>
   );

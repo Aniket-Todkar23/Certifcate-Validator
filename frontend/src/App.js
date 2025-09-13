@@ -3,46 +3,64 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
-import AdminLoginPage from './pages/AdminLoginPage';
+import LoginPage from './pages/LoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import VerifierDashboardPage from './pages/VerifierDashboardPage';
+import BulkUploadPage from './pages/BulkUploadPage';
 import { apiService } from './services/api';
 
 function App() {
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [adminUser, setAdminUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in by trying to access admin endpoint
+    // Check if user is already logged in by checking localStorage and validating token
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
     try {
-      const authData = await apiService.checkAuthStatus();
-      setIsAdminLoggedIn(authData.authenticated);
-      setAdminUser(authData.user || 'Administrator');
+      const token = localStorage.getItem('auth_token');
+      const userInfo = localStorage.getItem('user_info');
+      
+      if (token && userInfo) {
+        // Validate token with server
+        const authData = await apiService.checkAuthStatus();
+        setIsLoggedIn(authData.authenticated);
+        setUser(authData.user);
+      } else {
+        // No token or user info found
+        setIsLoggedIn(false);
+        setUser(null);
+      }
     } catch (error) {
-      setIsAdminLoggedIn(false);
-      setAdminUser(null);
+      // Token invalid or expired
+      console.warn('Auth check failed:', error.message);
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
+      setIsLoggedIn(false);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLogin = () => {
-    setIsAdminLoggedIn(true);
-    setAdminUser('Administrator');
+  const handleLogin = (userData) => {
+    setIsLoggedIn(true);
+    setUser(userData);
   };
 
   const handleLogout = async () => {
     try {
-      await apiService.adminLogout();
+      await apiService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      setIsAdminLoggedIn(false);
-      setAdminUser(null);
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
+      setIsLoggedIn(false);
+      setUser(null);
     }
   };
 
@@ -63,28 +81,56 @@ function App() {
     <Router>
       <div className="min-h-screen flex flex-col">
         <Navbar 
-          isAdminLoggedIn={isAdminLoggedIn} 
+          isLoggedIn={isLoggedIn}
+          user={user}
           onLogout={handleLogout}
         />
         
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} user={user} />} />
+          
+          {/* Login Route */}
           <Route 
-            path="/admin/login" 
+            path="/login" 
             element={
-              isAdminLoggedIn ? 
-                <Navigate to="/admin" replace /> : 
-                <AdminLoginPage onLogin={handleLogin} />
+              isLoggedIn ? 
+                <Navigate to={user?.role === 'admin' ? '/admin' : '/verifier'} replace /> : 
+                <LoginPage onLogin={handleLogin} />
             } 
           />
+          
+          {/* Admin Routes */}
           <Route 
             path="/admin" 
             element={
-              isAdminLoggedIn ? 
-                <AdminDashboardPage adminUser={adminUser} /> : 
-                <Navigate to="/admin/login" replace />
+              isLoggedIn && user?.role === 'admin' ? 
+                <AdminDashboardPage user={user} /> : 
+                <Navigate to="/login" replace />
             } 
           />
+          <Route 
+            path="/admin/bulk-upload" 
+            element={
+              isLoggedIn && user?.role === 'admin' ? 
+                <BulkUploadPage /> : 
+                <Navigate to="/login" replace />
+            } 
+          />
+          
+          {/* Verifier Routes */}
+          <Route 
+            path="/verifier" 
+            element={
+              isLoggedIn && user?.role === 'verifier' ? 
+                <VerifierDashboardPage user={user} /> : 
+                <Navigate to="/login" replace />
+            } 
+          />
+          
+          {/* Legacy admin login redirect */}
+          <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+          
+          {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         

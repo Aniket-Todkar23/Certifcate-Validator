@@ -44,15 +44,6 @@ class OCRProcessor:
                 r"Mother(?:'s)? Name:[\s]*([A-Za-z\s]+)",
                 r"Mrs\.[\s]*([A-Za-z\s]+)(?=\n|Mrs\.|$)"
             ],
-            'college_name': [
-                r'College\s*Name[\s.:]*([A-Za-z\s,]+?)(?=\n|SGPA|Result|$)',
-                r'COLLEGE\s*NAME[\s.:]*([A-Za-z\s,]+?)(?=\n|SGPA|Result|$)',
-                r'Institution[\s.:]*([A-Za-z\s,]+?)(?=\n|$)',
-                r'College[\s.:]*([A-Za-z\s,]+?)(?=\n|Third|$)',
-                r'(?:University|Institute)[\s.:]*([A-Za-z\s,]+?)(?=\n|$)',
-                r'(?:UNIVERSITY|INSTITUTE)[\s.:]*([A-Za-z\s,]+?)(?=\n|$)',
-                r'(?:COLLEGE)[\s.:]*([A-Za-z\s,]+?)(?=\n|$)'
-            ],
             'sgpa': [
                 r'Third\s*Semester\s*SGPA[\s.:]*([0-9.]+)',
                 r'SGPA[\s.:]*([0-9.]+)',
@@ -178,21 +169,24 @@ class OCRProcessor:
         # Clean up and format extracted data
         if extracted_data.get('student_name'):
             name = re.sub(r'[^A-Za-z\s]', '', extracted_data['student_name']).strip()
-            extracted_data['student_name'] = ' '.join(
-                word.capitalize() for word in name.split() if len(word) > 1
-            ) if name else None
+            # Normalize name: handle both CAPS and mixed case properly
+            if name:
+                # Split and properly title case each word
+                words = [word.strip().title() for word in name.split() if len(word.strip()) > 1]
+                extracted_data['student_name'] = ' '.join(words) if words else None
+            else:
+                extracted_data['student_name'] = None
             
         if extracted_data.get('mother_name'):
             name = re.sub(r'[^A-Za-z\s]', '', extracted_data['mother_name']).strip()
-            extracted_data['mother_name'] = ' '.join(
-                word.capitalize() for word in name.split() if len(word) > 1
-            ) if name else None
+            # Normalize name: handle both CAPS and mixed case properly
+            if name:
+                # Split and properly title case each word
+                words = [word.strip().title() for word in name.split() if len(word.strip()) > 1]
+                extracted_data['mother_name'] = ' '.join(words) if words else None
+            else:
+                extracted_data['mother_name'] = None
             
-        if extracted_data.get('college_name'):
-            college = re.sub(r'[^A-Za-z\s,&]', '', extracted_data['college_name']).strip()
-            extracted_data['college_name'] = ' '.join(
-                word.capitalize() for word in college.split() if len(word) > 1
-            ) if college else None
             
         if extracted_data.get('subject'):
             subject = re.sub(r'[^A-Za-z\s&]', '', extracted_data['subject']).strip()
@@ -217,7 +211,7 @@ class OCRProcessor:
                     extracted_data['sgpa'] = None
             except (ValueError, TypeError):
                 extracted_data['sgpa'] = None
-
+        
         return extracted_data
     
     def validate_extraction_quality(self, extracted_data: Dict[str, any]) -> Dict[str, any]:

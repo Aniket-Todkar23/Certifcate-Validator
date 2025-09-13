@@ -1,0 +1,32 @@
+{
+  "name": "certificate-validator-full-stack",
+  "version": "1.0.0",
+  "description": "Certificate Validator with React Frontend and Flask Backend",
+  "main": "app.py",
+  "scripts": {
+    "start": "concurrently \"powershell -File run-backend.ps1\" \"powershell -File run-frontend.ps1\"",
+    "backend": "powershell -File run-backend.ps1",
+    "frontend": "powershell -File run-frontend.ps1",
+    "install-all": "npm install && cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "test": "python test_bulk_upload.py",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\" --kill-others-on-fail"
+  },
+  "keywords": [
+    "certificate",
+    "validation",
+    "react",
+    "flask",
+    "csv",
+    "bulk-upload"
+  ],
+  "author": "Certificate Validator Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  }
+}

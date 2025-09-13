@@ -1,0 +1,6 @@
+seat_no,student_name,mother_name,college_name,sgpa,result_date,subject
+S1900508770,John Doe,Mary Doe,Pune Institute of Computer Technology,9.59,31 January 2025,Information Technology
+S1900508771,Jane Smith,Susan Smith,Mumbai University,8.75,15 February 2025,Computer Science
+S1900508772,Robert Johnson,Linda Johnson,Delhi College of Engineering,9.12,28 March 2025,Electronics Engineering
+S1900508773,Emily Davis,Patricia Davis,Chennai Institute of Technology,8.95,10 April 2025,Mechanical Engineering
+S1900508774,Michael Brown,Karen Brown,Bangalore Technical University,9.33,22 May 2025,Civil Engineering
