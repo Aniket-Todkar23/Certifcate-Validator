@@ -18,13 +18,13 @@ class OCRProcessor:
 
         self.patterns = {
             'seat_no': [
-                r'Seat\s*No[\s.:]*([A-Z0-9]+)',
-                r'SEAT\s*NO[\s.:]*([A-Z0-9]+)',
-                r'Seat\s*Number[\s.:]*([A-Z0-9]+)',
-                r'S[0-9]{10}',
-                r'(?:^|\s)([SsB][0-9]{7,12})(?:\s|$)',  # Common format like S1900508770
-                r'Registration\s*(?:No|Number)[\s.:]*([A-Z0-9]+)',
-                r'Roll\s*(?:No|Number)[\s.:]*([A-Z0-9]+)'
+                r'Seat\s*No[\s.:]*([A-Z0-9$]+)',  # Added $ to handle OCR error
+                r'SEAT\s*NO[\s.:]*([A-Z0-9$]+)',  # Added $ to handle OCR error
+                r'Seat\s*Number[\s.:]*([A-Z0-9$]+)',  # Added $ to handle OCR error
+                r'[S$][0-9]{10}',  # Handle S/$ OCR confusion
+                r'(?:^|\s)([SsB$][0-9]{7,12})(?:\s|$)',  # Added $ to handle OCR error
+                r'Registration\s*(?:No|Number)[\s.:]*([A-Z0-9$]+)',
+                r'Roll\s*(?:No|Number)[\s.:]*([A-Z0-9$]+)'
             ],
             'student_name': [
                 r'Student\s*Name[\s.:]*([A-Za-z\s]+?)(?=Mother|$)',
@@ -195,7 +195,9 @@ class OCRProcessor:
             ) if subject else None
             
         if extracted_data.get('seat_no'):
-            seat_no = re.sub(r'[^A-Za-z0-9]', '', extracted_data['seat_no']).strip()
+            seat_no = re.sub(r'[^A-Za-z0-9$]', '', extracted_data['seat_no']).strip()
+            # Fix common OCR error: $ → S
+            seat_no = seat_no.replace('$', 'S')
             extracted_data['seat_no'] = seat_no.upper() if seat_no else None
             
         if extracted_data.get('sgpa'):
@@ -211,7 +213,7 @@ class OCRProcessor:
                     extracted_data['sgpa'] = None
             except (ValueError, TypeError):
                 extracted_data['sgpa'] = None
-        
+        print(extracted_data)
         return extracted_data
     
     def validate_extraction_quality(self, extracted_data: Dict[str, any]) -> Dict[str, any]:
