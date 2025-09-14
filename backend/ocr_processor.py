@@ -66,14 +66,33 @@ class OCRProcessor:
                 r'(?:^|\s)([0-9]{2}-[0-9]{2}-[0-9]{4})(?:\s|$)'   # DD-MM-YYYY format
             ],
             'subject': [
-                r'SUB[\s.:]*\(([^)]+)\)',
-                r'Subject[\s.:]*([A-Za-z\s&]+?)(?=\n|$)',
-                r'SUBJECT[\s.:]*([A-Za-z\s&]+?)(?=\n|$)',
-                r'Course[\s.:]*([A-Za-z\s&]+?)(?=\n|$)',
-                r'Programme[\s.:]*([A-Za-z\s&]+?)(?=\n|$)',
-                r'Branch[\s.:]*([A-Za-z\s&]+?)(?=\n|$)',
-                r'Specialization[\s.:]*([A-Za-z\s&]+?)(?=\n|$)',
-                r'Department\s*of\s*([A-Za-z\s&]+?)(?=\n|$)'
+                # Primary SUB: patterns - these should match first
+                r'SUB:([A-Za-z\s&.]+?)(?=\n|Grade|Result|SGPA|GPA|Semester|$)',  # SUB:INFORMATION TECHNOLOGY
+                r'SUB\s*:\s*([A-Za-z\s&.]+?)(?=\n|Grade|Result|SGPA|GPA|Semester|$)',  # SUB: INFORMATION TECHNOLOGY (with spaces)
+                r'[S$]UB:([A-Za-z\s&.]+?)(?=\n|Grade|Result|SGPA|GPA|Semester|$)',  # $UB:INFORMATION TECHNOLOGY (OCR error)
+                r'[S$]UB\s*:\s*([A-Za-z\s&.]+?)(?=\n|Grade|Result|SGPA|GPA|Semester|$)',  # $UB: INFORMATION TECHNOLOGY
+                
+                # SUB with other separators
+                r'SUB[\s.:]*\(([^)]+)\)',  # SUB (Any Subject)
+                r'SUB[\s.]*([A-Za-z\s&.]{3,50})(?=\n|Grade|Result|SGPA|GPA|Semester|$)',  # SUB Any Subject
+                r'[S$]UB[\s.:]*\(([^)]+)\)',  # OCR: S might be read as $
+                r'[S$]UB[\s.]*([A-Za-z\s&.]{3,50})(?=\n|Grade|Result|SGPA|GPA|Semester|$)',
+                
+                # More flexible SUB patterns
+                r'SUB[\s.:]*([A-Za-z][A-Za-z\s&.]*?)(?=\s*(?:Grade|Result|SGPA|GPA|Semester|\n|$))',
+                r'[S$]UB[\s.:]*([A-Za-z][A-Za-z\s&.]*?)(?=\s*(?:Grade|Result|SGPA|GPA|Semester|\n|$))',
+                
+                # Generic subject patterns (fallback)
+                r'Subject[\s.:]*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                r'SUBJECT[\s.:]*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                r'Course[\s.:]*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                r'Programme[\s.:]*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                r'Branch[\s.:]*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                r'Specialization[\s.:]*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                r'Department\s*of\s*([A-Za-z\s&.]+?)(?=\n|Grade|Result|$)',
+                
+                # Line-based patterns for better extraction
+                r'(?:Subject|SUBJECT|Branch|BRANCH|Course|COURSE|Programme|PROGRAMME)[\s:.-]*([A-Za-z\s&.]{3,50})'
             ]
         }
     
@@ -149,7 +168,12 @@ class OCRProcessor:
                 # Try on full text first
                 matches = re.findall(pattern, text_clean, re.IGNORECASE)
                 if matches:
-                    value = matches[0].strip()
+                    # Handle both grouped and non-grouped patterns
+                    if isinstance(matches[0], tuple):
+                        value = matches[0][0].strip() if matches[0][0] else None
+                    else:
+                        value = matches[0].strip()
+                    
                     if value and len(value) > 1:  # Ensure meaningful extraction
                         extracted_data[field] = value
                         break
@@ -159,7 +183,12 @@ class OCRProcessor:
                     for line in lines:
                         line_matches = re.findall(pattern, line.strip(), re.IGNORECASE)
                         if line_matches:
-                            value = line_matches[0].strip()
+                            # Handle both grouped and non-grouped patterns
+                            if isinstance(line_matches[0], tuple):
+                                value = line_matches[0][0].strip() if line_matches[0][0] else None
+                            else:
+                                value = line_matches[0].strip()
+                            
                             if value and len(value) > 1:
                                 extracted_data[field] = value
                                 break
@@ -189,10 +218,38 @@ class OCRProcessor:
             
             
         if extracted_data.get('subject'):
-            subject = re.sub(r'[^A-Za-z\s&]', '', extracted_data['subject']).strip()
-            extracted_data['subject'] = ' '.join(
-                word.capitalize() for word in subject.split() if len(word) > 1
-            ) if subject else None
+            subject = extracted_data['subject'].strip()
+            
+            # Clean up extracted subject - remove SUB prefix if present
+            subject = re.sub(r'^SUB[\s.:]*', '', subject, flags=re.IGNORECASE).strip()
+            subject = re.sub(r'^[S$]UB[\s.:]*', '', subject, flags=re.IGNORECASE).strip()  # Handle OCR errors
+            
+            # Remove leading colon if present (from SUB:SUBJECT format)
+            subject = re.sub(r'^:', '', subject).strip()
+            
+            # Remove any remaining parentheses or brackets
+            subject = re.sub(r'[()[\]{}]', '', subject).strip()
+            
+            # Clean up other unwanted characters but keep dots for abbreviations
+            subject = re.sub(r'[^A-Za-z\s&.]', '', subject).strip()
+            
+            # Normalize to proper case for any subject
+            if subject:
+                words = []
+                for word in subject.split():
+                    if len(word) > 1:
+                        # Handle common abbreviations (keep as uppercase)
+                        if len(word) <= 4 and word.upper() == word.replace('.', ''):
+                            words.append(word.upper())
+                        # Handle articles and prepositions (keep lowercase)
+                        elif word.lower() in ['and', 'of', 'in', 'with', 'the', 'for', 'on', 'at', 'by']:
+                            words.append(word.lower())
+                        # Regular words - title case
+                        else:
+                            words.append(word.capitalize())
+                extracted_data['subject'] = ' '.join(words) if words else None
+            else:
+                extracted_data['subject'] = None
             
         if extracted_data.get('seat_no'):
             seat_no = re.sub(r'[^A-Za-z0-9$]', '', extracted_data['seat_no']).strip()
