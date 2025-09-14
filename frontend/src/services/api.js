@@ -218,6 +218,32 @@ export const apiService = {
     
     return { success: true, message: 'Fraud logs exported successfully' };
   },
+
+  // Blacklist Management APIs
+  addToBlacklist: async (fraudLogId, blacklistReason = '', autoBlockSeatNo = true, autoBlockNameCombo = false) => {
+    const response = await apiClient.post('/api/blacklist', {
+      fraud_detection_log_id: fraudLogId,
+      blacklist_reason: blacklistReason,
+      auto_block_seat_no: autoBlockSeatNo,
+      auto_block_name_combo: autoBlockNameCombo
+    });
+    return response.data;
+  },
+
+  getBlacklistItems: async (page = 1, perPage = 20) => {
+    const response = await apiClient.get(`/api/blacklist?page=${page}&per_page=${perPage}`);
+    return response.data;
+  },
+
+  removeFromBlacklist: async (fraudLogId) => {
+    const response = await apiClient.delete(`/api/blacklist/${fraudLogId}`);
+    return response.data;
+  },
+
+  getBlacklistStats: async () => {
+    const response = await apiClient.get('/api/blacklist/stats');
+    return response.data;
+  },
 };
 
 // Error handling interceptor

@@ -201,3 +201,40 @@ class FraudDetectionLog(db.Model):
             'admin_notes': self.admin_notes,
             'reviewed_at': self.reviewed_at.isoformat() if self.reviewed_at else None
         }
+
+class Blacklist(db.Model):
+    """Blacklist model for tracking fraudulent certificates that should be blocked"""
+    __tablename__ = 'blacklist'
+    
+    # Use fraud_detection_log_id as primary key
+    fraud_detection_log_id = db.Column(db.Integer, db.ForeignKey('fraud_detection_log.id'), primary_key=True)
+    
+    # Blacklist details
+    blacklisted_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Admin who blacklisted
+    blacklist_reason = db.Column(db.Text, nullable=True)  # Additional reason for blacklisting
+    blacklisted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Auto-blocking settings
+    auto_block_seat_no = db.Column(db.Boolean, default=True)  # Block future submissions with same seat number
+    auto_block_name_combo = db.Column(db.Boolean, default=False)  # Block same student+mother name combo
+    
+    # Status
+    is_active = db.Column(db.Boolean, default=True)  # Can be deactivated if needed
+    
+    # Relationships
+    fraud_log = db.relationship('FraudDetectionLog', backref='blacklist_entry')
+    blacklisted_by_user = db.relationship('User', backref='blacklisted_items')
+    
+    def to_dict(self):
+        return {
+            'fraud_detection_log_id': self.fraud_detection_log_id,
+            'blacklisted_by': self.blacklisted_by,
+            'blacklist_reason': self.blacklist_reason,
+            'blacklisted_at': self.blacklisted_at.isoformat() if self.blacklisted_at else None,
+            'auto_block_seat_no': self.auto_block_seat_no,
+            'auto_block_name_combo': self.auto_block_name_combo,
+            'is_active': self.is_active,
+            # Include fraud log details
+            'fraud_log': self.fraud_log.to_dict() if self.fraud_log else None,
+            'blacklisted_by_username': self.blacklisted_by_user.username if self.blacklisted_by_user else None
+        }

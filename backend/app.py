@@ -4,7 +4,7 @@ Handles all API endpoints and web interface """
 
 import os
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from flask import Flask, request, jsonify, redirect, session, make_response
 from flask_cors import CORS
@@ -14,7 +14,7 @@ import json
 import pandas as pd
 from io import StringIO
 
-from models import db, Institution, Certificate, User, AdminUser, VerificationLog, FraudDetectionLog
+from models import db, Institution, Certificate, User, AdminUser, VerificationLog, FraudDetectionLog, Blacklist
 from ocr_processor import OCRProcessor
 from verifier import CertificateVerifier
 from auth import JWTAuth, token_required, admin_required, verifier_or_admin_required, get_current_user
@@ -108,7 +108,7 @@ def login():
             return jsonify({'error': 'Invalid credentials'}), 401
 
         # Update last login
-        user.last_login = datetime.utcnow()
+        user.last_login = datetime.now(timezone.utc)
         db.session.commit()
 
         # Generate JWT token
@@ -606,7 +606,7 @@ def bulk_upload_certificates():
                     result_date=cert_data['result_date'],
                     subject=cert_data['subject'],
                     is_active=True,
-                    created_at=datetime.utcnow()
+                    created_at=datetime.now(timezone.utc)
                 )
                 certificate_objects.append(certificate)
             
@@ -745,8 +745,12 @@ def get_fraud_logs():
         date_from = request.args.get('date_from', '')
         date_to = request.args.get('date_to', '')
         
-        # Build query
-        query = FraudDetectionLog.query
+        # Build query - exclude blacklisted items
+        query = FraudDetectionLog.query.outerjoin(
+            Blacklist, FraudDetectionLog.id == Blacklist.fraud_detection_log_id
+        ).filter(
+            Blacklist.fraud_detection_log_id.is_(None)  # Only include non-blacklisted items
+        )
         
         # Apply status filter
         if status_filter and status_filter in ['FAKE', 'SUSPICIOUS']:
@@ -805,7 +809,7 @@ def update_fraud_log(fraud_id):
         if 'reviewed_by_admin' in data:
             fraud_log.reviewed_by_admin = data['reviewed_by_admin']
             if data['reviewed_by_admin']:
-                fraud_log.reviewed_at = datetime.utcnow()
+                fraud_log.reviewed_at = datetime.now(timezone.utc)
         
         db.session.commit()
         return jsonify(fraud_log.to_dict()), 200
@@ -824,27 +828,42 @@ def get_fraud_stats():
     try:
         from sqlalchemy import func
         
-        # Get counts by status
+        # Get counts by status - exclude blacklisted items
         status_counts = db.session.query(
             FraudDetectionLog.fraud_status, 
             func.count(FraudDetectionLog.id)
+        ).outerjoin(
+            Blacklist, FraudDetectionLog.id == Blacklist.fraud_detection_log_id
+        ).filter(
+            Blacklist.fraud_detection_log_id.is_(None)
         ).group_by(FraudDetectionLog.fraud_status).all()
         
-        # Get daily counts for last 30 days
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        # Get daily counts for last 30 days - exclude blacklisted items
+        thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
         daily_counts = db.session.query(
             func.date(FraudDetectionLog.detected_at).label('date'),
             func.count(FraudDetectionLog.id).label('count')
+        ).outerjoin(
+            Blacklist, FraudDetectionLog.id == Blacklist.fraud_detection_log_id
         ).filter(
-            FraudDetectionLog.detected_at >= thirty_days_ago
+            FraudDetectionLog.detected_at >= thirty_days_ago,
+            Blacklist.fraud_detection_log_id.is_(None)
         ).group_by(
             func.date(FraudDetectionLog.detected_at)
         ).all()
         
-        # Get review status
-        total_fraud = FraudDetectionLog.query.count()
-        reviewed_count = FraudDetectionLog.query.filter(
-            FraudDetectionLog.reviewed_by_admin == True
+        # Get review status - exclude blacklisted items
+        total_fraud = FraudDetectionLog.query.outerjoin(
+            Blacklist, FraudDetectionLog.id == Blacklist.fraud_detection_log_id
+        ).filter(
+            Blacklist.fraud_detection_log_id.is_(None)
+        ).count()
+        
+        reviewed_count = FraudDetectionLog.query.outerjoin(
+            Blacklist, FraudDetectionLog.id == Blacklist.fraud_detection_log_id
+        ).filter(
+            FraudDetectionLog.reviewed_by_admin == True,
+            Blacklist.fraud_detection_log_id.is_(None)
         ).count()
         
         return jsonify({
@@ -874,8 +893,12 @@ def export_fraud_logs():
         date_from = request.args.get('date_from', '')
         date_to = request.args.get('date_to', '')
         
-        # Build query (same as get_fraud_logs but without pagination)
-        query = FraudDetectionLog.query
+        # Build query (same as get_fraud_logs but without pagination) - exclude blacklisted items
+        query = FraudDetectionLog.query.outerjoin(
+            Blacklist, FraudDetectionLog.id == Blacklist.fraud_detection_log_id
+        ).filter(
+            Blacklist.fraud_detection_log_id.is_(None)  # Only include non-blacklisted items
+        )
         
         # Apply status filter
         if status_filter and status_filter in ['FAKE', 'SUSPICIOUS']:
@@ -957,6 +980,170 @@ def export_fraud_logs():
 
     except Exception as e:
         return jsonify({'error': f'Export failed: {str(e)}'}), 500
+
+
+@app.route('/api/blacklist', methods=['POST'])
+@token_required
+@admin_required
+def add_to_blacklist():
+    """Add a fraud detection log to the blacklist (admin only)"""
+    
+    try:
+        data = request.get_json()
+        fraud_log_id = data.get('fraud_detection_log_id')
+        blacklist_reason = data.get('blacklist_reason', '')
+        auto_block_seat_no = data.get('auto_block_seat_no', True)
+        auto_block_name_combo = data.get('auto_block_name_combo', False)
+        
+        if not fraud_log_id:
+            return jsonify({'error': 'fraud_detection_log_id is required'}), 400
+        
+        # Check if fraud log exists and is FAKE
+        fraud_log = FraudDetectionLog.query.get_or_404(fraud_log_id)
+        if fraud_log.fraud_status != 'FAKE':
+            return jsonify({'error': 'Only FAKE certificates can be blacklisted'}), 400
+        
+        # Check if already blacklisted
+        existing_blacklist = Blacklist.query.filter_by(fraud_detection_log_id=fraud_log_id).first()
+        if existing_blacklist:
+            return jsonify({'error': 'This fraud log is already blacklisted'}), 400
+        
+        # Get current user
+        current_user = get_current_user()
+        
+        # Create blacklist entry
+        blacklist_entry = Blacklist(
+            fraud_detection_log_id=fraud_log_id,
+            blacklisted_by=current_user.get('user_id'),  # Use 'user_id' from JWT payload
+            blacklist_reason=blacklist_reason,
+            auto_block_seat_no=auto_block_seat_no,
+            auto_block_name_combo=auto_block_name_combo,
+            blacklisted_at=datetime.now(timezone.utc)
+        )
+        
+        db.session.add(blacklist_entry)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Certificate added to blacklist successfully',
+            'blacklist_entry': blacklist_entry.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Blacklist creation error: {str(e)}")
+        return jsonify({'error': f'Failed to add to blacklist: {str(e)}'}), 500
+
+
+@app.route('/api/blacklist', methods=['GET'])
+@token_required
+@admin_required
+def get_blacklist():
+    """Get blacklisted certificates (admin only)"""
+    
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        
+        # Build query with joins
+        query = Blacklist.query.join(
+            FraudDetectionLog, Blacklist.fraud_detection_log_id == FraudDetectionLog.id
+        ).filter(Blacklist.is_active == True)
+        
+        # Order by most recent first
+        query = query.order_by(Blacklist.blacklisted_at.desc())
+        
+        # Paginate
+        blacklist_items = query.paginate(page=page, per_page=per_page, error_out=False)
+        
+        return jsonify({
+            'blacklist_items': [item.to_dict() for item in blacklist_items.items],
+            'total': blacklist_items.total,
+            'pages': blacklist_items.pages,
+            'current_page': page,
+            'per_page': per_page,
+            'has_next': blacklist_items.has_next,
+            'has_prev': blacklist_items.has_prev
+        }), 200
+        
+    except Exception as e:
+        app.logger.error(f"Get blacklist error: {str(e)}")
+        return jsonify({'error': f'Failed to get blacklist: {str(e)}'}), 500
+
+
+@app.route('/api/blacklist/<int:fraud_log_id>', methods=['DELETE'])
+@token_required
+@admin_required
+def remove_from_blacklist(fraud_log_id):
+    """Remove a certificate from blacklist (admin only)"""
+    
+    try:
+        blacklist_entry = Blacklist.query.filter_by(fraud_detection_log_id=fraud_log_id).first()
+        if not blacklist_entry:
+            return jsonify({'error': 'Blacklist entry not found'}), 404
+        
+        # Soft delete by setting is_active to False
+        blacklist_entry.is_active = False
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Certificate removed from blacklist successfully'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Remove from blacklist error: {str(e)}")
+        return jsonify({'error': f'Failed to remove from blacklist: {str(e)}'}), 500
+
+
+@app.route('/api/blacklist/stats')
+@token_required
+@admin_required
+def get_blacklist_stats():
+    """Get blacklist statistics (admin only)"""
+    
+    try:
+        from sqlalchemy import func
+        
+        # Get total blacklisted count
+        total_blacklisted = Blacklist.query.filter_by(is_active=True).count()
+        
+        # Get counts by auto-block settings
+        auto_block_seat_count = Blacklist.query.filter_by(
+            is_active=True, auto_block_seat_no=True
+        ).count()
+        
+        auto_block_name_count = Blacklist.query.filter_by(
+            is_active=True, auto_block_name_combo=True
+        ).count()
+        
+        # Get daily blacklist counts for last 30 days
+        thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
+        daily_counts = db.session.query(
+            func.date(Blacklist.blacklisted_at).label('date'),
+            func.count(Blacklist.fraud_detection_log_id).label('count')
+        ).filter(
+            Blacklist.blacklisted_at >= thirty_days_ago,
+            Blacklist.is_active == True
+        ).group_by(
+            func.date(Blacklist.blacklisted_at)
+        ).all()
+        
+        return jsonify({
+            'total_blacklisted': total_blacklisted,
+            'auto_block_seat_count': auto_block_seat_count,
+            'auto_block_name_count': auto_block_name_count,
+            'daily_counts': [{
+                'date': str(date),
+                'count': count
+            } for date, count in daily_counts]
+        }), 200
+        
+    except Exception as e:
+        app.logger.error(f"Get blacklist stats error: {str(e)}")
+        return jsonify({'error': f'Failed to get blacklist stats: {str(e)}'}), 500
 
 
 @app.route('/api/certificates/bulk-approve', methods=['POST'])
@@ -1102,7 +1289,7 @@ def bulk_approve_certificates():
                     result_date=cert_data['result_date'],
                     subject=cert_data['subject'],
                     is_active=True,
-                    created_at=datetime.utcnow()
+                    created_at=datetime.now(timezone.utc)
                 )
                 certificate_objects.append(certificate)
             
@@ -1177,14 +1364,14 @@ def health_check():
         db.session.execute(text('SELECT 1'))
         return jsonify({
             'status': 'healthy',
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'version': '1.0.0'
         }), 200
     except Exception as e:
         return jsonify({
             'status': 'unhealthy',
             'error': str(e),
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }), 500
 
 

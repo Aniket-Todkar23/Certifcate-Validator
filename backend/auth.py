@@ -6,7 +6,7 @@ Handles token generation, validation, and role-based access control
 
 import jwt
 import bcrypt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from flask import request, jsonify, current_app
 from typing import Dict, Any, Optional
@@ -33,8 +33,8 @@ class JWTAuth:
             'username': user_data['username'],
             'role': user_data['role'],
             'full_name': user_data.get('full_name', user_data['username']),
-            'iat': datetime.utcnow(),
-            'exp': datetime.utcnow() + timedelta(hours=self.token_expiry_hours)
+            'iat': datetime.now(timezone.utc),
+            'exp': datetime.now(timezone.utc) + timedelta(hours=self.token_expiry_hours)
         }
         
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
