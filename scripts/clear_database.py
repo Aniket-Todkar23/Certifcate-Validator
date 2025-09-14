@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Clear Database Script for Certificate Validator
+Clear Database Script for PramanMitra
 Clears all records from the database tables while keeping the structure
 """
 

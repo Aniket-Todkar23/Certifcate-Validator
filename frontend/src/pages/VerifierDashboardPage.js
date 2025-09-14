@@ -59,7 +59,7 @@ const VerifierDashboardPage = ({ user }) => {
           </div>
         </div>
 
-        {/* Main Certificate Validator Component */}
+        {/* Main Certificate Validation Component */}
         <CertificateValidator userRole="verifier" />
       </div>
     </>

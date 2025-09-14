@@ -1,4 +1,4 @@
-# Backend runner script for Certificate Validator
+# Backend runner script for PramanMitra
 # Activates virtual environment and runs Flask app
 
 Write-Host "Starting Backend Server..." -ForegroundColor Green

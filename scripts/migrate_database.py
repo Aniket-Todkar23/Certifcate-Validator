@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database Migration Script for Certificate Validator
+Database Migration Script for PramanMitra
 - Removes college_name column from certificates table
 - Creates fraud_detection_log table
 - Preserves existing data
@@ -225,7 +225,7 @@ def verify_migration(db_path):
 if __name__ == '__main__':
     db_path = 'certificate_validator.db'
     
-    print("🚀 Certificate Validator Database Migration")
+    print("🚀 PramanMitra Database Migration")
     print("=" * 50)
     print("This script will:")
     print("  1. Create a backup of your database")
@@ -247,7 +247,7 @@ if __name__ == '__main__':
         # Verify migration
         if verify_migration(db_path):
             print("\n🎉 Migration completed successfully!")
-            print("Your certificate validator is now updated with:")
+            print("Your PramanMitra is now updated with:")
             print("  ✅ College name verification removed")
             print("  ✅ Fraud detection logging enabled")
             print("  ✅ Admin fraud dashboard ready")

@@ -165,21 +165,31 @@ const HomePage = ({ isLoggedIn = false, user = null }) => {
   return (
     <>
       <Header 
-        title="Certificate Authenticity Validator"
-        subtitle="Government of Jharkhand - Digital Certificate Verification System"
-        description="Secure and reliable certificate verification powered by AI technology"
+        title="प्रमाण मित्र - PramanMitra"
+        subtitle="Advanced Certificate Guardian - Powered by AI"
+        description="Your trusted companion for certificate authenticity verification with cutting-edge fraud detection"
       />
       
       <div className="max-w-7xl mx-auto px-6 flex-1">
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-12">
           {features.map((feature, index) => (
-            <div key={index} className="glass-card p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-blue-500/50 hover:bg-slate-800/90">
-              <div className="w-10 h-10 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg text-white">
+            <div 
+              key={index} 
+              className={`glass-card-enhanced feature-card p-6 text-center animate-delay-${index + 1}`}
+            >
+              <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-600 to-cyan-500 rounded-xl text-white feature-icon hover-glow">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-slate-100">{feature.title}</h3>
-              <p className="text-slate-300 text-sm">{feature.description}</p>
+              <h3 className="text-lg font-bold mb-3 gradient-text-primary">{feature.title}</h3>
+              <p className="text-slate-300 text-sm leading-relaxed">{feature.description}</p>
+              
+              {/* Decorative Elements */}
+              <div className="flex justify-center mt-4 space-x-1">
+                <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: `${index * 0.2}s`}}></div>
+                <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: `${index * 0.2 + 0.1}s`}}></div>
+                <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: `${index * 0.2 + 0.2}s`}}></div>
+              </div>
             </div>
           ))}
         </div>

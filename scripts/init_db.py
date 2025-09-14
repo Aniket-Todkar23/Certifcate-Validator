@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database initialization script for Certificate Validator
+Database initialization script for PramanMitra
 Creates tables and populates with sample data for testing
 """
 

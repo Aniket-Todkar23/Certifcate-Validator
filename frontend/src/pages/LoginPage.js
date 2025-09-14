@@ -68,9 +68,9 @@ const LoginPage = ({ onLogin }) => {
   return (
     <>
       <Header 
-        title="Certificate Validator Login"
+        title="PramanMitra Login"
         subtitle="Secure Access Portal"
-        description="Login with your credentials to access the certificate validation system"
+        description="Login with your credentials to access the advanced certificate guardian system"
       />
       
       <div className="max-w-7xl mx-auto px-6 flex-1">

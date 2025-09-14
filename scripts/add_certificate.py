@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Add Certificate Script for Certificate Validator
+Add Certificate Script for PramanMitra
 Adds a specific certificate record to the database
 """
 

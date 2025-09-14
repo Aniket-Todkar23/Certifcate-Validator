@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Main entry point for the Certificate Validator backend
+Main entry point for the PramanMitra backend
 """
 
 from app import app

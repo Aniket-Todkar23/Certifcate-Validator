@@ -1,4 +1,4 @@
-# Certificate Validator - Full Stack Application
+# PramanMitra - Full Stack Application
 
 🎓 A comprehensive digital platform for authenticating academic certificates and detecting fraudulent documents using OCR, machine learning, and database verification.
 

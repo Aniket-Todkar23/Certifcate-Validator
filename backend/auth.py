@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JWT Authentication Module for Certificate Validator
+JWT Authentication Module for PramanMitra
 Handles token generation, validation, and role-based access control
 """
 

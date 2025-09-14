@@ -1,4 +1,4 @@
-# 🎓 Certificate Validator - Presentation Overview
+# 🎓 PramanMitra - Presentation Overview
 
 ## 📋 **Proposed Solution**
 
@@ -11,7 +11,7 @@ Academic certificate fraud has become a significant challenge in educational ins
 
 ### **Our Solution: AI-Powered Certificate Authentication Platform**
 
-The Certificate Validator is a comprehensive digital platform that revolutionizes the academic certificate verification process through:
+PramanMitra is a comprehensive digital platform that revolutionizes the academic certificate verification process through:
 
 #### **Core Solution Components:**
 
@@ -266,7 +266,7 @@ The Certificate Validator is a comprehensive digital platform that revolutionize
 
 ## 💡 **Conclusion**
 
-The Certificate Validator represents a significant advancement in academic credential verification technology. By combining cutting-edge AI, robust security, and user-friendly design, it addresses critical challenges in education and employment sectors.
+PramanMitra represents a significant advancement in academic credential verification technology. By combining cutting-edge AI, robust security, and user-friendly design, it addresses critical challenges in education and employment sectors.
 
 **Key Value Propositions:**
 - 🚀 **Innovation**: First-of-its-kind comprehensive verification platform
@@ -286,7 +286,7 @@ This solution not only solves current certificate verification challenges but al
 - 📄 **Documentation**: See README.md for technical details
 
 ---
-*© 2025 Certificate Validator - Revolutionizing Academic Credential Verification*
+*© 2025 PramanMitra - Revolutionizing Academic Credential Verification*
 
 ---
 

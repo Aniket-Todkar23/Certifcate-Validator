@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simplified OCR Processor for Certificate Validator
+Simplified OCR Processor for PramanMitra
 Extracts minimal required fields from result PDF or image
 """
 

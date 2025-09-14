@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldCheckIcon } from '@heroicons/react/24/solid';
+import PramanMitraLogo from './PramanMitraLogo';
 
 const Navbar = ({ isLoggedIn, user, onLogout }) => {
   const location = useLocation();
@@ -12,9 +12,8 @@ const Navbar = ({ isLoggedIn, user, onLogout }) => {
   return (
     <nav className="bg-slate-800/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-slate-600/30">
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-16">
-        <Link to="/" className="flex items-center gap-3 text-slate-100 hover:text-blue-400 transition-colors font-semibold text-xl no-underline">
-          <ShieldCheckIcon className="w-6 h-6" />
-          Certificate Validator
+        <Link to="/" className="hover:text-blue-400 transition-colors no-underline">
+          <PramanMitraLogo size="medium" showText={true} animated={true} />
         </Link>
         
         <ul className="flex items-center gap-4 list-none">

@@ -37,7 +37,7 @@ const AdminLoginPage = ({ onLogin }) => {
     <>
       <Header 
         title="Admin Login"
-        subtitle="Certificate Validator Administration"
+        subtitle="PramanMitra Administration"
         description="Access admin dashboard to manage certificates and view analytics"
       />
       

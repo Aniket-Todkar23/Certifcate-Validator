@@ -1,8 +1,8 @@
-# Certificate Validator - Quick Start Script
+# PramanMitra - Quick Start Script
 # Simple and reliable startup for both frontend and backend
 
 Write-Host ""
-Write-Host "Certificate Validator - Quick Start" -ForegroundColor Cyan
+Write-Host "PramanMitra - Quick Start" -ForegroundColor Cyan
 Write-Host "======================================" -ForegroundColor Cyan
 Write-Host ""
 

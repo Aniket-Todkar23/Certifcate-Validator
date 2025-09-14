@@ -1,7 +1,7 @@
 {
-  "name": "certificate-validator-full-stack",
+  "name": "pramanmitra-full-stack",
   "version": "1.0.0",
-  "description": "Certificate Validator with React Frontend and Flask Backend",
+  "description": "PramanMitra with React Frontend and Flask Backend",
   "main": "app.py",
   "scripts": {
     "start": "concurrently \"powershell -File run-backend.ps1\" \"powershell -File run-frontend.ps1\"",
@@ -20,7 +20,7 @@
     "csv",
     "bulk-upload"
   ],
-  "author": "Certificate Validator Team",
+  "author": "PramanMitra Team",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"

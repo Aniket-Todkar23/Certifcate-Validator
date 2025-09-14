@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import FloatingAnimations from './components/FloatingAnimations';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import VerifierDashboardPage from './pages/VerifierDashboardPage';
 import BulkUploadPage from './pages/BulkUploadPage';
 import { apiService } from './services/api';
+import './styles/PramanMitraAnimations.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -79,7 +81,8 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col relative">
+        <FloatingAnimations />
         <Navbar 
           isLoggedIn={isLoggedIn}
           user={user}

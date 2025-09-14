@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database Viewer Script for Certificate Validator
+Database Viewer Script for PramanMitra
 Shows all records in the database tables
 """
 
@@ -63,7 +63,7 @@ def view_database():
     """View all database contents"""
     with app.app_context():
         try:
-            print("\n🔍 CERTIFICATE VALIDATOR DATABASE VIEWER")
+            print("\n🔍 PRAMANMITRA DATABASE VIEWER")
             print(f"📅 Generated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
             
             # View Certificates

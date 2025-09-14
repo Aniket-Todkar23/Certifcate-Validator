@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Main Flask Application for Certificate Validator
+""" Main Flask Application for PramanMitra
 Handles all API endpoints and web interface """
 
 import os

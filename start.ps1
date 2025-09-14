@@ -1,7 +1,7 @@
-# Certificate Validator - Start Script
+# PramanMitra - Start Script
 # This script starts both the Flask backend and React frontend concurrently
 
-Write-Host "🚀 Starting Certificate Validator Full Stack Application..." -ForegroundColor Green
+Write-Host "🚀 Starting PramanMitra Full Stack Application..." -ForegroundColor Green
 Write-Host ""
 
 # Check if Python is installed
