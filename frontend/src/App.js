@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingAnimations from './components/FloatingAnimations';
@@ -10,6 +10,14 @@ import VerifierDashboardPage from './pages/VerifierDashboardPage';
 import BulkUploadPage from './pages/BulkUploadPage';
 import { apiService } from './services/api';
 import './styles/PramanMitraAnimations.css';
+
+// Component to conditionally render animations based on route
+const ConditionalAnimations = () => {
+  const location = useLocation();
+  const showAnimations = location.pathname === '/' || location.pathname === '/login';
+  
+  return showAnimations ? <FloatingAnimations /> : null;
+};
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -82,7 +90,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col relative">
-        <FloatingAnimations />
+        <ConditionalAnimations />
         <Navbar 
           isLoggedIn={isLoggedIn}
           user={user}

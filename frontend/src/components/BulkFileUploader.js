@@ -192,10 +192,10 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="w-full max-w-4xl mx-auto p-6 glass-card">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Bulk File Upload</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-slate-100 mb-2">Bulk File Upload</h2>
+        <p className="text-slate-300">
           Upload multiple files: Certificate images (PNG, JPG, PDF) and CSV data files
         </p>
       </div>
@@ -204,8 +204,8 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
       <div
         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
           dragActive 
-            ? 'border-blue-500 bg-blue-50' 
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-blue-500 bg-blue-500/10' 
+            : 'border-slate-600 hover:border-slate-500 bg-slate-700/30'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -220,11 +220,11 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         
-        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <p className="text-lg font-semibold text-gray-700 mb-2">
+        <Upload className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+        <p className="text-lg font-semibold text-slate-100 mb-2">
           Drop files here or click to browse
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-slate-300">
           Supported: Images (PNG, JPG, PDF), CSV files • Max 16MB each
         </p>
       </div>
@@ -233,19 +233,19 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
       {files.length > 0 && (
         <div className="mt-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-slate-100">
               Files ({files.length})
             </h3>
             <div className="space-x-2">
               <button
                 onClick={selectAll}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-blue-400 hover:text-blue-300"
               >
                 Select All
               </button>
               <button
                 onClick={deselectAll}
-                className="text-sm text-gray-600 hover:text-gray-800"
+                className="text-sm text-slate-400 hover:text-slate-300"
               >
                 Deselect All
               </button>
@@ -264,7 +264,7 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
               <div
                 key={fileItem.id}
                 className={`flex items-center p-3 border rounded-lg ${
-                  selectedFiles.has(fileItem.id) ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
+                  selectedFiles.has(fileItem.id) ? 'bg-blue-500/10 border-blue-500/30' : 'bg-slate-700/30 border-slate-600/30'
                 }`}
               >
                 <input
@@ -279,24 +279,24 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
                 <div className="flex-1 ml-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-slate-100">
                         {fileItem.file.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-400">
                         {getFileTypeLabel(fileItem.file)} • {formatFileSize(fileItem.file.size)}
                       </p>
                     </div>
                     
                     <div className="flex items-center space-x-2">
                       {fileItem.status === 'processed' && (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <CheckCircle className="w-5 h-5 text-green-400" />
                       )}
                       {fileItem.status === 'error' && (
-                        <AlertCircle className="w-5 h-5 text-red-500" />
+                        <AlertCircle className="w-5 h-5 text-red-400" />
                       )}
                       <button
                         onClick={() => removeFile(fileItem.id)}
-                        className="text-gray-400 hover:text-red-500"
+                        className="text-slate-400 hover:text-red-400"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -304,7 +304,7 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
                   </div>
                   
                   {fileItem.status === 'error' && (
-                    <p className="text-xs text-red-600 mt-1">{fileItem.error}</p>
+                    <p className="text-xs text-red-400 mt-1">{fileItem.error}</p>
                   )}
                 </div>
               </div>
@@ -315,10 +315,10 @@ const BulkFileUploader = ({ onFilesProcessed, isAdmin = false }) => {
 
       {/* Processing Status */}
       {isProcessing && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        <div className="mt-6 p-4 glass-card rounded-lg">
           <div className="flex items-center">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-            <p className="text-blue-800">Processing files...</p>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-3"></div>
+            <p className="text-slate-100">Processing files...</p>
           </div>
         </div>
       )}

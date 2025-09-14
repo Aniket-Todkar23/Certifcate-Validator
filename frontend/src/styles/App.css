@@ -48,6 +48,9 @@ body {
   color: #e2e8f0;
   line-height: 1.6;
   min-height: 100vh;
+  /* Ensure gradient doesn't repeat */
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 .app {

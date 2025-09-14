@@ -119,15 +119,15 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
     if (item.data.type === 'csv') {
       return (
         <div className="mt-3">
-          <h5 className="font-medium text-gray-700 mb-2">
+          <h5 className="font-medium text-slate-100 mb-2">
             CSV Data ({item.data.records.length} records)
           </h5>
-          <div className="bg-gray-50 rounded p-3 max-h-60 overflow-auto">
+          <div className="bg-slate-700/30 rounded p-3 max-h-60 overflow-auto">
             <table className="min-w-full text-xs">
               <thead>
                 <tr>
                   {item.data.headers.map((header, idx) => (
-                    <th key={idx} className="px-2 py-1 text-left font-medium text-gray-700 border-b">
+                    <th key={idx} className="px-2 py-1 text-left font-medium text-slate-100 border-b border-slate-600">
                       {header}
                     </th>
                   ))}
@@ -135,9 +135,9 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
               </thead>
               <tbody>
                 {item.data.records.map((record, idx) => (
-                  <tr key={idx} className={`border-t ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                  <tr key={idx} className={`border-t border-slate-600 ${idx % 2 === 0 ? 'bg-slate-800/30' : 'bg-slate-700/20'}`}>
                     {item.data.headers.map((header, colIdx) => (
-                      <td key={colIdx} className="px-2 py-1 text-gray-600 border-r">
+                      <td key={colIdx} className="px-2 py-1 text-slate-300 border-r border-slate-600">
                         {record[header] || 'N/A'}
                       </td>
                     ))}
@@ -146,7 +146,7 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
               </tbody>
             </table>
           </div>
-          <div className="mt-2 text-xs text-gray-500">
+          <div className="mt-2 text-xs text-slate-400">
             Total records: {item.data.records.length}
           </div>
         </div>
@@ -155,22 +155,22 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
       const data = item.data.extracted_data;
       return (
         <div className="mt-3">
-          <h5 className="font-medium text-gray-700 mb-2">
+          <h5 className="font-medium text-slate-100 mb-2">
             Extracted Data (Confidence: {(item.data.confidence * 100).toFixed(1)}%)
           </h5>
-          <div className="bg-gray-50 rounded p-3">
+          <div className="bg-slate-700/30 rounded p-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               {Object.entries(data).map(([key, value]) => (
                 <div key={key} className="flex flex-col">
-                  <span className="font-medium text-gray-600 text-xs uppercase tracking-wide">{key.replace('_', ' ')}:</span>
-                  <span className="mt-1 text-gray-800 bg-white px-2 py-1 rounded border">{value || 'N/A'}</span>
+                  <span className="font-medium text-slate-300 text-xs uppercase tracking-wide">{key.replace('_', ' ')}:</span>
+                  <span className="mt-1 text-slate-100 bg-slate-800/50 px-2 py-1 rounded border border-slate-600">{value || 'N/A'}</span>
                 </div>
               ))}
             </div>
             {item.data.raw_text && (
               <div className="mt-3">
-                <span className="font-medium text-gray-600 text-xs uppercase tracking-wide">Raw OCR Text:</span>
-                <div className="mt-1 text-xs text-gray-600 bg-white px-2 py-2 rounded border max-h-20 overflow-auto">
+                <span className="font-medium text-slate-300 text-xs uppercase tracking-wide">Raw OCR Text:</span>
+                <div className="mt-1 text-xs text-slate-300 bg-slate-800/50 px-2 py-2 rounded border border-slate-600 max-h-20 overflow-auto">
                   {item.data.raw_text}
                 </div>
               </div>
@@ -185,12 +185,12 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
     if (editingItem !== item.id) return null;
     
     return (
-      <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded">
-        <h5 className="font-medium text-gray-700 mb-3">Edit Data</h5>
+      <div className="mt-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded">
+        <h5 className="font-medium text-slate-100 mb-3">Edit Data</h5>
         <div className="grid grid-cols-2 gap-3">
           {Object.entries(editData).map(([key, value]) => (
             <div key={key}>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium text-slate-300 mb-1">
                 {key}
               </label>
               <input
@@ -200,7 +200,7 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
                   ...prev,
                   [key]: e.target.value
                 }))}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-sm bg-slate-800 border border-slate-600 text-slate-100 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           ))}
@@ -214,7 +214,7 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
           </button>
           <button
             onClick={cancelEdit}
-            className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700"
+            className="px-3 py-1 bg-slate-600 text-white rounded text-sm hover:bg-slate-700"
           >
             Cancel
           </button>
@@ -226,28 +226,28 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
   if (!processedFiles || processedFiles.length === 0) {
     return (
       <div className="text-center py-8">
-        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <p className="text-gray-600">No processed files to review</p>
+        <Upload className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+        <p className="text-slate-300">No processed files to review</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="w-full max-w-6xl mx-auto p-6 glass-card rounded-lg shadow-lg">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Review Processed Files</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-slate-100 mb-2">Review Processed Files</h2>
+        <p className="text-slate-300">
           Review extracted data and approve for database insertion
         </p>
       </div>
 
       {/* Action Bar */}
-      <div className="flex justify-between items-center mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="flex justify-between items-center mb-6 p-4 bg-slate-700/30 rounded-lg">
         <div className="flex items-center space-x-4">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-slate-100">
             {processedFiles.length} files processed
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-slate-400">
             {selectedItems.size} selected
           </span>
         </div>
@@ -255,13 +255,13 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
         <div className="flex space-x-2">
           <button
             onClick={selectAll}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-blue-400 hover:text-blue-300"
           >
             Select All
           </button>
           <button
             onClick={deselectAll}
-            className="text-sm text-gray-600 hover:text-gray-800"
+            className="text-sm text-slate-400 hover:text-slate-300"
           >
             Deselect All
           </button>
@@ -281,7 +281,7 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
           <div
             key={item.id}
             className={`border rounded-lg overflow-hidden transition-all ${
-              selectedItems.has(item.id) ? 'border-blue-300 bg-blue-50' : 'border-gray-200'
+              selectedItems.has(item.id) ? 'border-blue-500/50 bg-blue-500/10' : 'border-slate-600/50'
             }`}
           >
             <div className="p-4">
@@ -296,16 +296,16 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
                   
                   <div className="flex items-center space-x-2">
                     {item.status === 'processed' ? (
-                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <CheckCircle className="w-5 h-5 text-green-400" />
                     ) : (
-                      <AlertCircle className="w-5 h-5 text-red-500" />
+                      <AlertCircle className="w-5 h-5 text-red-400" />
                     )}
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-slate-100">
                       {item.file.name}
                     </span>
                   </div>
                   
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                  <span className="text-xs px-2 py-1 bg-slate-700/50 text-slate-300 rounded">
                     {item.data.type.toUpperCase()}
                   </span>
                 </div>
@@ -313,14 +313,14 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => startEdit(item)}
-                    className="p-1 text-blue-400 hover:text-blue-600"
+                    className="p-1 text-blue-400 hover:text-blue-300"
                     title="Edit data"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onReject && onReject(item)}
-                    className="p-1 text-red-400 hover:text-red-600"
+                    className="p-1 text-red-400 hover:text-red-300"
                     title="Remove file"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -337,9 +337,9 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
       </div>
 
       {/* Summary */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-        <h3 className="font-medium text-blue-800 mb-2">Submission Summary</h3>
-        <div className="text-sm text-blue-700">
+      <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <h3 className="font-medium text-blue-400 mb-2">Submission Summary</h3>
+        <div className="text-sm text-slate-300">
           <p>Ready to submit {selectedItems.size} files to the database</p>
           <p className="text-xs mt-1">
             All selected items will be added as new certificate records

@@ -50,14 +50,14 @@ const BulkUploadPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Bulk Upload</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-bold text-slate-100">Bulk Upload</h1>
+              <p className="mt-2 text-slate-300">
                 Upload and manage certificate files in bulk
               </p>
             </div>
@@ -65,7 +65,7 @@ const BulkUploadPage = () => {
             {step === 'review' && (
               <button
                 onClick={handleBackToUpload}
-                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center px-4 py-2 text-slate-300 hover:text-slate-100 border border-slate-600 rounded-lg hover:bg-slate-700/50"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Upload
@@ -76,18 +76,18 @@ const BulkUploadPage = () => {
           {/* Step Indicator */}
           <div className="mt-6">
             <div className="flex items-center">
-              <div className={`flex items-center ${step === 'upload' ? 'text-blue-600' : 'text-green-600'}`}>
+              <div className={`flex items-center ${step === 'upload' ? 'text-blue-400' : 'text-green-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  step === 'upload' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
+                  step === 'upload' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'
                 }`}>
                   {step === 'upload' ? '1' : <CheckCircle className="w-5 h-5" />}
                 </div>
                 <span className="ml-2 font-medium">Upload Files</span>
               </div>
               
-              <div className={`flex items-center ml-8 ${step === 'review' ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`flex items-center ml-8 ${step === 'review' ? 'text-blue-400' : 'text-slate-500'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  step === 'review' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
+                  step === 'review' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-slate-700/50 text-slate-500 border border-slate-600/30'
                 }`}>
                   2
                 </div>
@@ -129,7 +129,7 @@ const BulkUploadPage = () => {
         )}
 
         {/* Main Content */}
-        <div className="bg-white rounded-lg shadow">
+        <div className="glass-card">
           {step === 'upload' && (
             <div className="p-6">
               <BulkFileUploader onFilesProcessed={handleFilesProcessed} isAdmin={true} />
@@ -147,11 +147,11 @@ const BulkUploadPage = () => {
               
               {processedFiles.length === 0 && approvalResults && (
                 <div className="text-center py-12">
-                  <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <CheckCircle className="mx-auto h-12 w-12 text-green-400 mb-4" />
+                  <h3 className="text-lg font-medium text-slate-100 mb-2">
                     All Files Processed
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-slate-300 mb-4">
                     All uploaded files have been successfully processed and approved.
                   </p>
                   <button
@@ -167,19 +167,21 @@ const BulkUploadPage = () => {
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-800 mb-3">How to Use Bulk Upload</h3>
-          <div className="space-y-2 text-blue-700">
-            <p>📁 <strong>Step 1:</strong> Drag and drop or select multiple files (CSV, PDF, Images)</p>
-            <p>🔄 <strong>Step 2:</strong> Click "Process Files" to extract data automatically</p>
-            <p>👁️ <strong>Step 3:</strong> Review extracted data, edit if needed, and select files to approve</p>
-            <p>✅ <strong>Step 4:</strong> Click "Submit Selected" to add certificates to database</p>
-          </div>
-          
-          <div className="mt-4 p-3 bg-blue-100 rounded">
-            <p className="text-sm text-blue-800">
-              <strong>Supported Files:</strong> PNG, JPG, PDF (for OCR), CSV (for bulk data) • Max 16MB each
-            </p>
+        <div className="mt-8 glass-card">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-blue-400 mb-3">How to Use Bulk Upload</h3>
+            <div className="space-y-2 text-slate-300">
+              <p>📁 <strong>Step 1:</strong> Drag and drop or select multiple files (CSV, PDF, Images)</p>
+              <p>🔄 <strong>Step 2:</strong> Click "Process Files" to extract data automatically</p>
+              <p>👁️ <strong>Step 3:</strong> Review extracted data, edit if needed, and select files to approve</p>
+              <p>✅ <strong>Step 4:</strong> Click "Submit Selected" to add certificates to database</p>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <p className="text-sm text-blue-300">
+                <strong>Supported Files:</strong> PNG, JPG, PDF (for OCR), CSV (for bulk data) • Max 16MB each
+              </p>
+            </div>
           </div>
         </div>
       </div>
