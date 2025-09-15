@@ -4,12 +4,24 @@ Clear Database Script for PramanMitra
 Clears all records from the database tables while keeping the structure
 """
 
+import sys
+import os
+from pathlib import Path
+
+# Add backend to path
+sys.path.append(str(Path(__file__).parent.parent / 'backend'))
+
 from flask import Flask
-from models import db, Certificate, Institution, AdminUser, VerificationLog
+from models import db, User, Certificate, Institution, VerificationLog, FraudDetectionLog, Blacklist
+from auth import JWTAuth
 
 # Initialize Flask app
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///certificate_validator.db'
+
+# Get the absolute path to the database (same as init_users.py)
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATABASE_PATH = BASE_DIR / 'data' / 'certificate_validator.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
@@ -17,12 +29,28 @@ db.init_app(app)
 
 def clear_database():
     """Clear all records from database tables"""
+    
+    # Initialize JWT auth for password hashing
+    jwt_secret = os.environ.get('JWT_SECRET_KEY', 'your-super-secret-jwt-key-change-in-production')
+    auth = JWTAuth(jwt_secret)
+    
     with app.app_context():
         try:
+            # Create tables if they don't exist
+            db.create_all()
+            
             # Clear all tables in reverse order to avoid foreign key conflicts
             print("Clearing database records...")
             
-            # Clear verification logs first
+            # Clear blacklist first (depends on fraud detection log)
+            deleted_blacklist = Blacklist.query.delete()
+            print(f"✓ Deleted {deleted_blacklist} blacklist records")
+            
+            # Clear fraud detection logs
+            deleted_fraud = FraudDetectionLog.query.delete()
+            print(f"✓ Deleted {deleted_fraud} fraud detection log records")
+            
+            # Clear verification logs
             deleted_logs = VerificationLog.query.delete()
             print(f"✓ Deleted {deleted_logs} verification log records")
             
@@ -34,20 +62,21 @@ def clear_database():
             deleted_institutions = Institution.query.delete()
             print(f"✓ Deleted {deleted_institutions} institution records")
             
-            # Clear admin users (we'll add back a default one)
-            deleted_admins = AdminUser.query.delete()
-            print(f"✓ Deleted {deleted_admins} admin user records")
+            # Clear users (we'll add back a default admin)
+            deleted_users = User.query.delete()
+            print(f"✓ Deleted {deleted_users} user records")
             
             # Add back a default admin user for testing
-            # Note: In production, use proper password hashing
-            admin = AdminUser(
+            admin = User(
                 username='admin',
-                password_hash='admin',  # Simple password for testing
-                email='admin@example.com',
+                password_hash=auth.hash_password('admin123'),
+                email='admin@certvalidator.com',
+                full_name='System Administrator',
+                role='admin',
                 is_active=True
             )
             db.session.add(admin)
-            print("✓ Added default admin user (username: admin, password: admin)")
+            print("✓ Added default admin user (username: admin, password: admin123)")
             
             # Add back some sample institutions for testing
             institutions = [
@@ -89,7 +118,9 @@ def clear_database():
             print("Database is now ready for testing with:")
             print("- 0 certificates")
             print("- 0 verification logs") 
-            print("- 1 admin user (username: admin, password: admin)")
+            print("- 0 fraud detection logs")
+            print("- 0 blacklist entries")
+            print("- 1 admin user (username: admin, password: admin123)")
             print("- 3 sample institutions")
             print("")
             print("You can now test the bulk upload functionality with fresh data.")
