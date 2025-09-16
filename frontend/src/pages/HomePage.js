@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/solid';
 import Header from '../components/Header';
 import FAQ from '../components/FAQ';
+import VideoShowcase from '../components/VideoShowcase';
 import { apiService } from '../services/api';
 
 const HomePage = ({ isLoggedIn = false, user = null }) => {
@@ -168,6 +169,12 @@ const HomePage = ({ isLoggedIn = false, user = null }) => {
         title="प्रमाण मित्र - PramanMitra"
         subtitle="Advanced Certificate Guardian - Powered by AI"
         description="Your trusted companion for certificate authenticity verification with cutting-edge fraud detection"
+      />
+      
+      {/* Video Showcase Section */}
+      <VideoShowcase 
+        videoSrc="https://youtu.be/5J3EiZseQKI"
+        videoType="youtube"
       />
       
       <div className="max-w-7xl mx-auto px-6 flex-1">

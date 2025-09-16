@@ -9,9 +9,7 @@ import {
   LightBulbIcon,
   MagnifyingGlassIcon,
   CalendarIcon,
-  FolderOpenIcon,
   DocumentArrowUpIcon,
-  ArrowDownTrayIcon,
   TableCellsIcon,
   ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
@@ -23,9 +21,7 @@ const AdminDashboardPage = ({ adminUser }) => {
   const [stats, setStats] = useState(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, fraud-detection
-  const [ocrLoading, setOcrLoading] = useState(false);
   const [certLoading, setCertLoading] = useState(false);
-  const [csvLoading, setCsvLoading] = useState(false);
   const [ocrAlert, setOcrAlert] = useState(null);
   const [certAlert, setCertAlert] = useState(null);
   const [csvAlert, setCsvAlert] = useState(null);
@@ -65,7 +61,7 @@ const AdminDashboardPage = ({ adminUser }) => {
       return;
     }
 
-    setOcrLoading(true);
+    setOcrAlert({ type: 'info', message: 'Processing...' });
     try {
       const result = await apiService.extractOCR(file);
       setOcrAlert({ type: 'success', message: 'Data extracted successfully! Review and submit.' });
@@ -94,7 +90,7 @@ const AdminDashboardPage = ({ adminUser }) => {
         });
       }
     } finally {
-      setOcrLoading(false);
+      // Processing complete
     }
   };
 
@@ -164,7 +160,7 @@ const AdminDashboardPage = ({ adminUser }) => {
       return;
     }
 
-    setCsvLoading(true);
+    setCsvAlert({ type: 'info', message: 'Processing...' });
     try {
       const result = await apiService.bulkUploadCertificates(file);
       
@@ -199,24 +195,11 @@ const AdminDashboardPage = ({ adminUser }) => {
         message: error.message || 'Failed to upload CSV file. Please try again.' 
       });
     } finally {
-      setCsvLoading(false);
+      // Processing complete
     }
   };
 
-  const handleDownloadTemplate = async () => {
-    try {
-      await apiService.downloadCsvTemplate();
-      setCsvAlert({ 
-        type: 'success', 
-        message: 'CSV template downloaded successfully!' 
-      });
-    } catch (error) {
-      setCsvAlert({ 
-        type: 'danger', 
-        message: error.message || 'Failed to download template. Please try again.' 
-      });
-    }
-  };
+  // Removed unused function handleDownloadTemplate
 
   // Auto-hide alerts after 5 seconds
   useEffect(() => {

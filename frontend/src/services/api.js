@@ -282,7 +282,7 @@ apiClient.interceptors.response.use(
         // Server error
         throw new Error('Server error. Please try again later.');
       } else {
-        // Other client errors
+      // Other client errors
         throw new Error(data?.error || 'An error occurred');
       }
     } else if (error.request) {
@@ -292,8 +292,6 @@ apiClient.interceptors.response.use(
       // Something happened in setting up the request
       throw new Error('Request failed. Please try again.');
     }
-    
-    return Promise.reject(error);
   }
 );
 

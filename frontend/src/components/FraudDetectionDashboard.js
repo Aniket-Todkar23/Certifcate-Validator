@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   ExclamationTriangleIcon,
   XCircleIcon,
-  EyeIcon,
   ArrowDownTrayIcon,
-  CalendarIcon,
   FunnelIcon,
   CheckCircleIcon,
   ClockIcon,
   DocumentTextIcon,
   ChartBarIcon,
   NoSymbolIcon,
-  TrashIcon,
-  PlusIcon
+  TrashIcon
 } from '@heroicons/react/24/outline';
 import { apiService } from '../services/api';
 
@@ -36,17 +33,7 @@ const FraudDetectionDashboard = () => {
     dateTo: ''
   });
 
-  useEffect(() => {
-    if (activeTab === 'fraud-logs') {
-      loadFraudData();
-      loadFraudStats();
-    } else if (activeTab === 'blacklist') {
-      loadBlacklistData();
-      loadBlacklistStats();
-    }
-  }, [currentPage, filters, activeTab]);
-
-  const loadFraudData = async () => {
+  const loadFraudData = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await apiService.getFraudLogs(
@@ -66,7 +53,7 @@ const FraudDetectionDashboard = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, filters]);
 
   const loadFraudStats = async () => {
     try {
@@ -77,7 +64,7 @@ const FraudDetectionDashboard = () => {
     }
   };
 
-  const loadBlacklistData = async () => {
+  const loadBlacklistData = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await apiService.getBlacklistItems(currentPage, 20);
@@ -91,7 +78,17 @@ const FraudDetectionDashboard = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (activeTab === 'fraud-logs') {
+      loadFraudData();
+      loadFraudStats();
+    } else if (activeTab === 'blacklist') {
+      loadBlacklistData();
+      loadBlacklistStats();
+    }
+  }, [currentPage, filters, activeTab, loadFraudData, loadBlacklistData]);
 
   const loadBlacklistStats = async () => {
     try {

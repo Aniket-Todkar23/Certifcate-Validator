@@ -4,15 +4,13 @@ import { apiService } from '../services/api';
 
 const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
   const [selectedItems, setSelectedItems] = useState(new Set());
-  const [expandedItems, setExpandedItems] = useState(new Set(processedFiles?.map(f => f.id) || []));
   const [editingItem, setEditingItem] = useState(null);
   const [editData, setEditData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto-expand all items when processedFiles changes
+  // Auto-select successfully processed items when processedFiles changes
   useEffect(() => {
     if (processedFiles && processedFiles.length > 0) {
-      setExpandedItems(new Set(processedFiles.map(f => f.id)));
       // Auto-select all successfully processed items
       setSelectedItems(new Set(processedFiles.filter(f => f.status === 'processed').map(f => f.id)));
     }
@@ -36,18 +34,6 @@ const BulkUploadReview = ({ processedFiles, onApprove, onReject, onEdit }) => {
 
   const deselectAll = () => {
     setSelectedItems(new Set());
-  };
-
-  const toggleExpanded = (itemId) => {
-    setExpandedItems(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId);
-      } else {
-        newSet.add(itemId);
-      }
-      return newSet;
-    });
   };
 
   const startEdit = (item) => {
