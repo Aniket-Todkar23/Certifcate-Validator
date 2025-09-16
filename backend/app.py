@@ -19,12 +19,26 @@ from ocr_processor import OCRProcessor
 from verifier import CertificateVerifier
 from auth import JWTAuth, token_required, admin_required, verifier_or_admin_required, get_current_user
 
+# Import configuration
+try:
+    from config import get_config
+    config = get_config()
+except ImportError:
+    # Fallback if config.py doesn't exist
+    config = None
+
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-in-production'  # Change in production
+
+# Apply configuration
+if config:
+    app.config.from_object(config)
+else:
+    # Fallback configuration
+    app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
 
 # JWT Configuration
-jwt_secret_key = os.environ.get('JWT_SECRET_KEY', 'your-super-secret-jwt-key-change-in-production')
+jwt_secret_key = app.config.get('JWT_SECRET_KEY') or os.environ.get('JWT_SECRET_KEY', 'your-super-secret-jwt-key-change-in-production')
 app.jwt_auth = JWTAuth(jwt_secret_key)
 
 # Configure session
@@ -35,12 +49,10 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 
 # Enable CORS for React frontend with proper configuration
-allowed_origins = ['http://localhost:3000', 'http://localhost:3001']
-if os.environ.get('VERCEL_URL'):
-    allowed_origins.extend([
-        f"https://{os.environ.get('VERCEL_URL')}",
-        'https://*.vercel.app'
-    ])
+if config and hasattr(config, 'CORS_ORIGINS'):
+    allowed_origins = config.CORS_ORIGINS
+else:
+    allowed_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,https://pramanmitra.vercel.app').split(',')
     
 CORS(app, 
      supports_credentials=True, 
@@ -51,20 +63,22 @@ CORS(app,
 # Get the absolute path to the project root
 BASE_DIR = Path(__file__).resolve().parent
 
-# Database configuration - PostgreSQL for production, SQLite for development
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    # Production: Use PostgreSQL (Neon)
-    if DATABASE_URL.startswith('postgres://'):
-        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-else:
-    # Development: Use SQLite
-    DATABASE_PATH = BASE_DIR.parent / 'data' / 'certificate_validator.db'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+# Database configuration - handled by config module
+if not config:
+    # Fallback database configuration
+    DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('NEON_DATABASE_URL')
+    if DATABASE_URL:
+        # Production: Use PostgreSQL (Neon)
+        if DATABASE_URL.startswith('postgres://'):
+            DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    else:
+        # Development: Use SQLite
+        DATABASE_PATH = BASE_DIR / 'certificates.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
+    
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Initialize extensions
 db.init_app(app)
