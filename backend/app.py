@@ -35,17 +35,34 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 
 # Enable CORS for React frontend with proper configuration
+allowed_origins = ['http://localhost:3000', 'http://localhost:3001']
+if os.environ.get('VERCEL_URL'):
+    allowed_origins.extend([
+        f"https://{os.environ.get('VERCEL_URL')}",
+        'https://*.vercel.app'
+    ])
+    
 CORS(app, 
      supports_credentials=True, 
-     origins=['http://localhost:3000', 'http://localhost:3001'],
+     origins=allowed_origins,
      allow_headers=['Content-Type', 'Authorization'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 # Get the absolute path to the project root
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_PATH = BASE_DIR / 'data' / 'certificate_validator.db'
+BASE_DIR = Path(__file__).resolve().parent
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
+# Database configuration - PostgreSQL for production, SQLite for development
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Production: Use PostgreSQL (Neon)
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    # Development: Use SQLite
+    DATABASE_PATH = BASE_DIR.parent / 'data' / 'certificate_validator.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -56,8 +73,8 @@ db.init_app(app)
 ocr_processor = OCRProcessor()
 verifier = CertificateVerifier()
 
-# Configuration
-UPLOAD_FOLDER = str(BASE_DIR / 'uploads')
+# Configuration - Use /tmp for serverless environments
+UPLOAD_FOLDER = '/tmp' if os.environ.get('VERCEL') else str(BASE_DIR / 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'pdf'}
 CSV_ALLOWED_EXTENSIONS = {'csv'}
 

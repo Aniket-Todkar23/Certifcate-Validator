@@ -13,4 +13,8 @@ pandas>=2.0.0
 PyJWT==2.8.0
 bcrypt==4.1.1
 passlib==1.7.4
+psycopg2-binary==2.9.9
+Flask-Migrate==4.0.5
+gunicorn==21.2.0
+python-dotenv==1.0.0
 # python-Levenshtein==0.21.1   # removed (forces compilation on Windows, rapidfuzz is a drop-in replacement)

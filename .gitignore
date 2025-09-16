@@ -141,3 +141,13 @@ Thumbs.db
 # Uploads directory (if it contains user-uploaded files)
 uploads/*
 !uploads/.gitkeep
+
+# Media and demo files
+demo/*.mp4
+demo/*.avi
+demo/*.mov
+demo/*.mkv
+# Keep small demo videos under 100MB
+!demo/*_small.mp4
+# But always keep README or documentation
+!demo/README.md

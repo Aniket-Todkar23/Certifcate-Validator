@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build: ./backend
+    container_name: pramanmitra-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:///certificates.db
+      - SECRET_KEY=${SECRET_KEY:-change-this-secret-key}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-change-this-jwt-key}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost}
+      - TESSERACT_CMD=/usr/bin/tesseract
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/data:/app/data
+      - backend-db:/app/instance
+    networks:
+      - pramanmitra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend service
+  frontend:
+    build: ./frontend
+    container_name: pramanmitra-frontend
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_API_URL=http://backend:5000/api
+    depends_on:
+      - backend
+    networks:
+      - pramanmitra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: PostgreSQL database for production
+  # Uncomment to use PostgreSQL instead of SQLite
+  # postgres:
+  #   image: postgres:14-alpine
+  #   container_name: pramanmitra-db
+  #   environment:
+  #     - POSTGRES_USER=pramanmitra
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD:-changeme}
+  #     - POSTGRES_DB=certificates
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - pramanmitra-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U pramanmitra"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Redis for caching and session management
+  # redis:
+  #   image: redis:alpine
+  #   container_name: pramanmitra-redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - pramanmitra-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 5
+
+networks:
+  pramanmitra-network:
+    driver: bridge
+
+volumes:
+  backend-db:
+  # postgres-data:  # Uncomment if using PostgreSQL
