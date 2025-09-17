@@ -1,6 +1,0 @@
-﻿FLASK_ENV=production
-SECRET_KEY=pramanmitra-prod-2024-secret-change-this
-JWT_SECRET_KEY=jwt-pramanmitra-prod-2024-secret-change
-CORS_ORIGINS=https://pramanmitra.vercel.app
-TESSERACT_CMD=tesseract
-NEON_DATABASE_URL=ADD_YOUR_NEON_CONNECTION_STRING_HERE
