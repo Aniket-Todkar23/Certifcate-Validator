@@ -20,11 +20,11 @@ class Config:
     DATABASE_URL = os.getenv('DATABASE_URL', os.getenv('NEON_DATABASE_URL'))
     
     if DATABASE_URL and DATABASE_URL.startswith('postgresql://'):
-        # Neon PostgreSQL configuration
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+        # Neon PostgreSQL configuration with pg8000 driver
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgresql://', 'postgresql+pg8000://', 1)
         # Neon requires SSL
-        if 'sslmode' not in DATABASE_URL:
-            SQLALCHEMY_DATABASE_URI = DATABASE_URL + ('&' if '?' in DATABASE_URL else '?') + 'sslmode=require'
+        if 'sslmode' not in SQLALCHEMY_DATABASE_URI:
+            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + ('&' if '?' in SQLALCHEMY_DATABASE_URI else '?') + 'sslmode=require'
     else:
         # Fallback to SQLite for local development
         basedir = os.path.abspath(os.path.dirname(__file__))
