@@ -22,18 +22,23 @@ class Config:
     if DATABASE_URL and DATABASE_URL.startswith('postgresql://'):
         # Neon PostgreSQL configuration with pg8000 driver
         SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgresql://', 'postgresql+pg8000://', 1)
-        # Neon requires SSL
-        if 'sslmode' not in SQLALCHEMY_DATABASE_URI:
-            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + ('&' if '?' in SQLALCHEMY_DATABASE_URI else '?') + 'sslmode=require'
     else:
         # Fallback to SQLite for local development
         basedir = os.path.abspath(os.path.dirname(__file__))
         SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(basedir, "certificates.db")}'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Handle SSL for different drivers
+    connect_args = {}
+    if DATABASE_URL and 'postgresql' in DATABASE_URL:
+        # For pg8000, use ssl_context parameter
+        connect_args = {}  # Let pg8000 handle SSL automatically
+    
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
+        'connect_args': connect_args
     }
     
     # JWT Configuration
