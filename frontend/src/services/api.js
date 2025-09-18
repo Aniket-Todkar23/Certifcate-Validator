@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL for the Flask backend
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://certifcate-validator.onrender.com';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
